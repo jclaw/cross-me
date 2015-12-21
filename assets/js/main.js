@@ -30,13 +30,13 @@ $(document).ready(function() {
 		boardComponents['cells'].on('mouseover', function(event) {
 			//console.log('over');
 			
-			$(this).addClass('mouseover');
+			// $(this).addClass('mouseover');
 				
 		});
 
 
 		boardComponents['cells'].on('mouseout', function(event) {
-			$(this).removeClass('mouseover');
+			// $(this).removeClass('mouseover');
 			//console.log('out');
 		});
 
@@ -84,17 +84,14 @@ $(document).ready(function() {
 			dragObject['curr'] = curr;
 
 			var elem = dragObject['stack'].pop();
+			dragObject['stack'].push(elem);
+			if (curr['row'] != elem['row'] || curr['col'] != elem['col']) {
 
-			if (curr['row'] == elem['row'] && curr['col'] == elem['col']) {
-				dragObject['stack'].push(elem);
-			} else {
+				find_direction(gameObject, dragObject);
 
-				find_direction(dragObject);
-				
 				var direction = dragObject['direction'],
 					class_name = 'active-cell',
 					state = 'stable';
-				
 
 				console.log('direction: ' + direction);
 				if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ) {
@@ -112,14 +109,12 @@ $(document).ready(function() {
 
 				console.log('state: ' + state);
 				if (state == 'expanding') {
-					dragObject['stack'].push(elem);
 					if (curr['cell'].hasClass(class_name)) curr['cell'] = '';
 					else curr['cell'].addClass(class_name);
 					dragObject['stack'].push(curr);
 				} else if (state == 'shrinking') {
+					dragObject['stack'].pop();
 					if (elem['cell'] != '') elem['cell'].removeClass(class_name);
-				} else {
-					dragObject['stack'].push(elem);
 				}
 				// pop cell off top of stack
 				// if left,
@@ -187,16 +182,22 @@ $(document).ready(function() {
 
 			// console.log("row: " + curr.row + "  col: " + curr.col);
 
-		find_direction(dragObject);
+		// find_direction(dragObject);
 
 
 		update_cells(gameObject, dragObject);
 	}
 
-	function find_direction(dragObject) {
-		var row_delta = dragObject['curr']['row'] - dragObject['start']['row'];
-		var col_delta = dragObject['curr']['col'] - dragObject['start']['col'];
-		var direction = dragObject['direction'];
+	function find_direction(gameObject, dragObject) {
+		console.log('find_direction');
+		var start = dragObject['start'],
+			curr = dragObject['curr'],
+			row_delta = curr['row'] - start['row'],
+			col_delta = curr['col'] - start['col'],
+			direction = dragObject['direction'];
+
+		console.log(row_delta);
+		console.log(col_delta);
 
 		if (Math.abs(col_delta) > Math.abs(row_delta)) {
 			if (col_delta < 0) direction = 'left';
@@ -206,11 +207,28 @@ $(document).ready(function() {
 			else if (row_delta > 0) direction = 'down';
 		}
 
-		// TODO: get this working
-		// if (dragObject['direction'] != 'none' && dragObject['direction'] != direction) {
-		// 	console.log('changed direction!');
-		// }
-
+		if (dragObject['direction'] != 'none' && dragObject['direction'] != direction) {
+			console.log('changed direction!');
+			debug_print_array(dragObject['stack'], 'stack');
+			while (dragObject['stack'].length > 1) {
+				var elem = dragObject['stack'].pop();
+				console.log(elem);
+				if (elem['cell'] != '') elem['cell'].removeClass('active-cell');
+			}
+			debug_print_array(dragObject['stack'], 'stack');
+			if (direction == 'left') {
+				for (var i = 1; i < Math.abs(col_delta); i++) {
+					var elem = {};
+					elem['cell'] = $(gameObject['array'][start.row][start.col - i]);
+					elem.row = start.row;
+					elem.col = start.col - i;
+					dragObject['stack'].push(elem);
+					elem['cell'].addClass('active-cell');
+				}
+			}
+			debug_print_array(dragObject['stack'], 'stack');
+		}
+		console.log(direction);
 		dragObject['direction'] = direction;
 	}
 
