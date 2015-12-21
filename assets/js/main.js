@@ -42,7 +42,6 @@ $(document).ready(function() {
 
 
 		boardComponents['cells'].on('dragstart', function(event) {
-			console.log($(this).toggleClass('active-cell'));
 
 
 			$(this).addClass('dragstart');
@@ -50,45 +49,84 @@ $(document).ready(function() {
 			dragObject['curr'] = {};
 			dragObject['start']['cell'] = $(this);
 			dragObject['direction'] = 'none';
-			dragObject['distance'] = 0;
+			// dragObject['distance'] = 0;
 			dragObject['stack'] = [];
 
 
-			var start_data = dragObject['start']['cell'].data('index').split(',');
-			dragObject['start']['row'] = Number(start_data[0]);
-			dragObject['start']['col'] = Number(start_data[1]);
+			var start_data = get_indices(dragObject['start']['cell']);
+			dragObject['start']['row'] = start_data[0];
+			dragObject['start']['col'] = start_data[1];
 			dragObject['curr']['row'] = dragObject['start']['row'];
 			dragObject['curr']['col'] = dragObject['start']['col'];
+			dragObject['stack'].push(dragObject['start']);
 			console.log('start');
+			//dragObject['stack'].push({cell: $(this), row: Number(start_data[0]), col: Number(start_data[1]) } );
+			console.log(dragObject['stack']);
+			console.log(dragObject['start']);
 		});
 
 
 		boardComponents['cells'].on('dragenter', function(event) {
+
 			var curr = {},
 				curr_data;
 			console.log('dragenter');
+			console.log(dragObject['stack']);
 
 			curr['cell'] = $(this);
-		
-			curr_data = curr['cell'].data('index').split(',');
+			curr_data = get_indices(curr['cell']);
 				
-			curr['row'] = Number(curr_data[0]);
-			curr['col'] = Number(curr_data[1]);
+			curr['row'] = curr_data[0];
+			curr['col'] = curr_data[1];
 
-			if (curr['row'] != dragObject['curr']['row'] || curr['col'] != dragObject['curr']['col']) {
+			var elem = dragObject['stack'].pop();
+
+			if (curr['row'] == elem['row'] && curr['col'] == elem['col']) {
+				dragObject['stack'].push(elem);
+			} else {
 				// TODO: decide whether to activate or deactivate: the line could be expanding or shrinking
 
+				find_direction(dragObject);
+				
+				var direction = dragObject['direction'],
+					class_name = 'active-cell';
+				
 
+				console.log('direction: ' + direction);
+				if (direction == 'left') {
+					if (elem.col < curr.col) {
+						dragObject['stack'].push(elem);
+						curr['row'] = dragObject['start']['row'];
+						if (curr['cell'].hasClass(class_name)) curr['cell'] = '';
+						else curr['cell'].addClass(class_name);
+						dragObject['stack'].push(curr);
+					} else if (cell.col > curr.col) {
+						// already popped
+						if (elem['cell'] != '') elem['cell'].removeClass(class_name);
+					}
+
+				}
+				// pop cell off top of stack
+				// if left,
+					// if cell.col < curr.col, push cell back on.
+						// if curr.hasClass('active-cell'), push obj with no cell field
+						// else push new cell (start.row, curr.col)
+					// else if cell.col > curr.col, toggle cell
+				
 
 				console.log('real dragenter');
+				console.log(dragObject['stack']);
 				dragObject['curr'] = curr;
-				activate_cells(gameObject, dragObject);
+				// activate_cells(gameObject, dragObject);
 			}
 		});
 
 		boardComponents['cells'].on('dragend', function(event) {
 			event = event.originalEvent || event;
 			$(this).removeClass('dragstart');
+
+			while (dragObject['stack'].length > 0) dragObject['stack'].pop();
+
 			console.log('end');
 			console.log(event.dataTransfer.dropEffect);
 		});
@@ -134,35 +172,33 @@ $(document).ready(function() {
 
 			// console.log("row: " + curr.row + "  col: " + curr.col);
 
-		find_direction(gameObject, dragObject);
+		find_direction(dragObject);
 
 
 		update_cells(gameObject, dragObject);
 	}
 
-	function find_direction(gameObject, dragObject) {
-
+	function find_direction(dragObject) {
+		console.log('find_direction');
 		var row_delta = dragObject['curr']['row'] - dragObject['start']['row'];
 		var col_delta = dragObject['curr']['col'] - dragObject['start']['col'];
-		var direction = 'none',
-			distance = dragObject['distance'];
+		var direction = 'none';
 
+		console.log('row_delta: ' + row_delta);
+		console.log('col_delta: ' + col_delta);
 		if (Math.abs(col_delta) > Math.abs(row_delta)) {
-			distance = Math.abs(col_delta);
 			if (col_delta < 0) direction = 'left';
 			else if (col_delta > 0) direction = 'right';
 		} else if (Math.abs(col_delta) < Math.abs(row_delta)) {
-			distance = Math.abs(row_delta);
 			if (row_delta < 0) direction = 'up';
 			else if (row_delta > 0) direction = 'down';
 		}
 
-		if (dragObject['direction'] != 'none' && dragObject['direction'] != direction) {
-			console.log('changed direction!');
-			restore_cells(gameObject, dragObject);
-		}
+		// TODO: get this working
+		// if (dragObject['direction'] != 'none' && dragObject['direction'] != direction) {
+		// 	console.log('changed direction!');
+		// }
 
-		dragObject['distance'] = distance;
 		dragObject['direction'] = direction;
 	}
 
@@ -261,6 +297,12 @@ $(document).ready(function() {
 			$(array[row + distance][col]).addClass('active-cell');
 		}
 
+	}
+
+	function get_indices(cell) { 
+		var arr = $(cell).data('index').split(',');
+		for (var i = 0; i < arr.length; i++) { arr[i] = +arr[i]; }
+		return arr;
 	}
 
 	function sign(x) { return x > 0 ? 1 : x < 0 ? -1 : 0; }
