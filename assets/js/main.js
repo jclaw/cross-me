@@ -93,25 +93,33 @@ $(document).ready(function() {
 				
 				var direction = dragObject['direction'],
 					class_name = 'active-cell',
-					expanding = false;
+					state = 'stable';
 				
 
 				console.log('direction: ' + direction);
 				if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ) {
 					curr['row'] = dragObject['start']['row'];
-					expanding = true;
+					curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
+					state = 'expanding';
 				} else if ( (direction == 'up' && curr.row < elem.row) || (direction == 'down' && curr.row > elem.row) ) {
 					curr['col'] = dragObject['start']['col'];
-					expanding = true;
+					curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
+					state = 'expanding';
+				} else if ( (direction == 'left' && curr.col > elem.col) || (direction == 'right' && curr.col < elem.col) ||
+							(direction == 'up' && curr.row > elem.row) || (direction == 'down' && curr.row < elem.row)		) {
+					state = 'shrinking';
 				}
 
-				if (expanding) {
+				console.log('state: ' + state);
+				if (state == 'expanding') {
 					dragObject['stack'].push(elem);
 					if (curr['cell'].hasClass(class_name)) curr['cell'] = '';
 					else curr['cell'].addClass(class_name);
 					dragObject['stack'].push(curr);
-				} else if (elem['cell'] != '') {
-					elem['cell'].removeClass(class_name);
+				} else if (state == 'shrinking') {
+					if (elem['cell'] != '') elem['cell'].removeClass(class_name);
+				} else {
+					dragObject['stack'].push(elem);
 				}
 				// pop cell off top of stack
 				// if left,
