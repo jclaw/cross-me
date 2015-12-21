@@ -64,7 +64,7 @@ $(document).ready(function() {
 			
 			console.log('start');
 			//dragObject['stack'].push({cell: $(this), row: Number(start_data[0]), col: Number(start_data[1]) } );
-			debug_print_array(dragObject['stack'], 'stack');
+
 
 		});
 
@@ -73,8 +73,8 @@ $(document).ready(function() {
 
 			var curr = {},
 				curr_data;
-			console.log('dragenter');
-			debug_print_array(dragObject['stack'], 'stack');
+			// console.log('dragenter');
+
 
 			curr['cell'] = $(this);
 			curr_data = get_indices(curr['cell']);
@@ -93,7 +93,7 @@ $(document).ready(function() {
 					class_name = 'active-cell',
 					state = 'stable';
 
-				console.log('direction: ' + direction);
+				// console.log('direction: ' + direction);
 				if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ) {
 					curr['row'] = dragObject['start']['row'];
 					curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
@@ -107,7 +107,7 @@ $(document).ready(function() {
 					state = 'shrinking';
 				}
 
-				console.log('state: ' + state);
+				// console.log('state: ' + state);
 				if (state == 'expanding') {
 					if (curr['cell'].hasClass(class_name)) curr['cell'] = '';
 					else curr['cell'].addClass(class_name);
@@ -125,7 +125,7 @@ $(document).ready(function() {
 				
 
 				console.log('real dragenter');
-				debug_print_array(dragObject['stack'], 'stack');
+				
 				dragObject['curr'] = curr; // TODO: do I need this?
 				// activate_cells(gameObject, dragObject);
 			}
@@ -189,15 +189,12 @@ $(document).ready(function() {
 	}
 
 	function find_direction(gameObject, dragObject) {
-		console.log('find_direction');
 		var start = dragObject['start'],
 			curr = dragObject['curr'],
 			row_delta = curr['row'] - start['row'],
 			col_delta = curr['col'] - start['col'],
 			direction = dragObject['direction'];
 
-		console.log(row_delta);
-		console.log(col_delta);
 
 		if (Math.abs(col_delta) > Math.abs(row_delta)) {
 			if (col_delta < 0) direction = 'left';
@@ -208,27 +205,33 @@ $(document).ready(function() {
 		}
 
 		if (dragObject['direction'] != 'none' && dragObject['direction'] != direction) {
-			console.log('changed direction!');
-			debug_print_array(dragObject['stack'], 'stack');
+
 			while (dragObject['stack'].length > 1) {
 				var elem = dragObject['stack'].pop();
-				console.log(elem);
 				if (elem['cell'] != '') elem['cell'].removeClass('active-cell');
 			}
-			debug_print_array(dragObject['stack'], 'stack');
-			if (direction == 'left') {
-				for (var i = 1; i < Math.abs(col_delta); i++) {
-					var elem = {};
-					elem['cell'] = $(gameObject['array'][start.row][start.col - i]);
-					elem.row = start.row;
-					elem.col = start.col - i;
-					dragObject['stack'].push(elem);
-					elem['cell'].addClass('active-cell');
+			var coef, r_off, c_off, distance;
+			distance = (direction == 'left' || direction == 'right') ? Math.abs(col_delta) : Math.abs(row_delta);
+
+			for (var i = 1; i < distance; i++) {
+				var elem = {};
+				if (direction == 'left' || direction == 'right') {
+					coef = (direction == 'left') ? -1 : 1;
+					r_off = 0;
+					c_off = i * coef;
+				} else if (direction == 'up' || direction == 'down') {
+					coef = (direction == 'up') ? -1 : 1;
+					r_off = i * coef;
+					c_off = 0;
 				}
+				elem['cell'] = $(gameObject['array'][start.row + r_off][start.col + c_off]);
+				elem.row = start.row + r_off;
+				elem.col = start.col + c_off;
+				dragObject['stack'].push(elem);
+				elem['cell'].addClass('active-cell');
 			}
-			debug_print_array(dragObject['stack'], 'stack');
+			
 		}
-		console.log(direction);
 		dragObject['direction'] = direction;
 	}
 
