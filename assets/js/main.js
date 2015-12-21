@@ -92,23 +92,26 @@ $(document).ready(function() {
 				find_direction(dragObject);
 				
 				var direction = dragObject['direction'],
-					class_name = 'active-cell';
+					class_name = 'active-cell',
+					expanding = false;
 				
 
 				console.log('direction: ' + direction);
-				if (direction == 'left') {
-					if (curr.col < elem.col) {
-						dragObject['stack'].push(elem);
-						curr['row'] = dragObject['start']['row'];
-						if (curr['cell'].hasClass(class_name)) curr['cell'] = '';
-						else curr['cell'].addClass(class_name);
-						dragObject['stack'].push(curr);
-					} else if (curr.col > elem.col) {
-						console.log('here');
-						// already popped
-						if (elem['cell'] != '') elem['cell'].removeClass(class_name);
-					}
+				if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ) {
+					curr['row'] = dragObject['start']['row'];
+					expanding = true;
+				} else if ( (direction == 'up' && curr.row < elem.row) || (direction == 'down' && curr.row > elem.row) ) {
+					curr['col'] = dragObject['start']['col'];
+					expanding = true;
+				}
 
+				if (expanding) {
+					dragObject['stack'].push(elem);
+					if (curr['cell'].hasClass(class_name)) curr['cell'] = '';
+					else curr['cell'].addClass(class_name);
+					dragObject['stack'].push(curr);
+				} else if (elem['cell'] != '') {
+					elem['cell'].removeClass(class_name);
 				}
 				// pop cell off top of stack
 				// if left,
@@ -120,7 +123,7 @@ $(document).ready(function() {
 
 				console.log('real dragenter');
 				debug_print_array(dragObject['stack'], 'stack');
-				dragObject['curr'] = curr;
+				dragObject['curr'] = curr; // TODO: do I need this?
 				// activate_cells(gameObject, dragObject);
 			}
 		});
