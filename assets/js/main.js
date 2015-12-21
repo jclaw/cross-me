@@ -58,11 +58,14 @@ $(document).ready(function() {
 			dragObject['start']['col'] = start_data[1];
 			dragObject['curr']['row'] = dragObject['start']['row'];
 			dragObject['curr']['col'] = dragObject['start']['col'];
+
+			dragObject['start']['cell'].addClass('active-cell');
 			dragObject['stack'].push(dragObject['start']);
+			
 			console.log('start');
 			//dragObject['stack'].push({cell: $(this), row: Number(start_data[0]), col: Number(start_data[1]) } );
-			console.log(dragObject['stack']);
-			console.log(dragObject['start']);
+			debug_print_array(dragObject['stack'], 'stack');
+
 		});
 
 
@@ -71,20 +74,20 @@ $(document).ready(function() {
 			var curr = {},
 				curr_data;
 			console.log('dragenter');
-			console.log(dragObject['stack']);
+			debug_print_array(dragObject['stack'], 'stack');
 
 			curr['cell'] = $(this);
 			curr_data = get_indices(curr['cell']);
 				
 			curr['row'] = curr_data[0];
 			curr['col'] = curr_data[1];
+			dragObject['curr'] = curr;
 
 			var elem = dragObject['stack'].pop();
 
 			if (curr['row'] == elem['row'] && curr['col'] == elem['col']) {
 				dragObject['stack'].push(elem);
 			} else {
-				// TODO: decide whether to activate or deactivate: the line could be expanding or shrinking
 
 				find_direction(dragObject);
 				
@@ -94,13 +97,14 @@ $(document).ready(function() {
 
 				console.log('direction: ' + direction);
 				if (direction == 'left') {
-					if (elem.col < curr.col) {
+					if (curr.col < elem.col) {
 						dragObject['stack'].push(elem);
 						curr['row'] = dragObject['start']['row'];
 						if (curr['cell'].hasClass(class_name)) curr['cell'] = '';
 						else curr['cell'].addClass(class_name);
 						dragObject['stack'].push(curr);
-					} else if (cell.col > curr.col) {
+					} else if (curr.col > elem.col) {
+						console.log('here');
 						// already popped
 						if (elem['cell'] != '') elem['cell'].removeClass(class_name);
 					}
@@ -115,7 +119,7 @@ $(document).ready(function() {
 				
 
 				console.log('real dragenter');
-				console.log(dragObject['stack']);
+				debug_print_array(dragObject['stack'], 'stack');
 				dragObject['curr'] = curr;
 				// activate_cells(gameObject, dragObject);
 			}
@@ -179,13 +183,10 @@ $(document).ready(function() {
 	}
 
 	function find_direction(dragObject) {
-		console.log('find_direction');
 		var row_delta = dragObject['curr']['row'] - dragObject['start']['row'];
 		var col_delta = dragObject['curr']['col'] - dragObject['start']['col'];
-		var direction = 'none';
+		var direction = dragObject['direction'];
 
-		console.log('row_delta: ' + row_delta);
-		console.log('col_delta: ' + col_delta);
 		if (Math.abs(col_delta) > Math.abs(row_delta)) {
 			if (col_delta < 0) direction = 'left';
 			else if (col_delta > 0) direction = 'right';
@@ -297,6 +298,14 @@ $(document).ready(function() {
 			$(array[row + distance][col]).addClass('active-cell');
 		}
 
+	}
+
+
+
+	function debug_print_array(array, name) {
+		console.log(name.toUpperCase());
+		for (var i = 0; i < array.length; i++) { console.log(array[i]); }
+		console.log('END ' + name.toUpperCase());
 	}
 
 	function get_indices(cell) { 
