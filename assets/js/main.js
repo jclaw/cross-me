@@ -87,47 +87,11 @@ $(document).ready(function() {
 			dragObject['stack'].push(elem);
 			if (curr['row'] != elem['row'] || curr['col'] != elem['col']) {
 
-				find_direction(gameObject, dragObject);
+				update_direction(gameObject, dragObject);
+				update_cell(gameObject, dragObject);
 
-				var direction = dragObject['direction'],
-					class_name = 'active-cell',
-					state = 'stable';
 
-				// console.log('direction: ' + direction);
-				if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ) {
-					curr['row'] = dragObject['start']['row'];
-					curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
-					state = 'expanding';
-				} else if ( (direction == 'up' && curr.row < elem.row) || (direction == 'down' && curr.row > elem.row) ) {
-					curr['col'] = dragObject['start']['col'];
-					curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
-					state = 'expanding';
-				} else if ( (direction == 'left' && curr.col > elem.col) || (direction == 'right' && curr.col < elem.col) ||
-							(direction == 'up' && curr.row > elem.row) || (direction == 'down' && curr.row < elem.row)		) {
-					state = 'shrinking';
-				}
 
-				// console.log('state: ' + state);
-				if (state == 'expanding') {
-					if (curr['cell'].hasClass(class_name)) curr['cell'] = '';
-					else curr['cell'].addClass(class_name);
-					dragObject['stack'].push(curr);
-				} else if (state == 'shrinking') {
-					dragObject['stack'].pop();
-					if (elem['cell'] != '') elem['cell'].removeClass(class_name);
-				}
-				// pop cell off top of stack
-				// if left,
-					// if cell.col < curr.col, push cell back on.
-						// if curr.hasClass('active-cell'), push obj with no cell field
-						// else push new cell (start.row, curr.col)
-					// else if cell.col > curr.col, toggle cell
-				
-
-				console.log('real dragenter');
-				
-				dragObject['curr'] = curr; // TODO: do I need this?
-				// activate_cells(gameObject, dragObject);
 			}
 		});
 
@@ -178,17 +142,8 @@ $(document).ready(function() {
 		// }
 	}
 
-	function activate_cells(gameObject, dragObject) {
 
-			// console.log("row: " + curr.row + "  col: " + curr.col);
-
-		// find_direction(dragObject);
-
-
-		update_cells(gameObject, dragObject);
-	}
-
-	function find_direction(gameObject, dragObject) {
+	function update_direction(gameObject, dragObject) {
 		var start = dragObject['start'],
 			curr = dragObject['curr'],
 			row_delta = curr['row'] - start['row'],
@@ -204,8 +159,9 @@ $(document).ready(function() {
 			else if (row_delta > 0) direction = 'down';
 		}
 
-		if (dragObject['direction'] != 'none' && dragObject['direction'] != direction) {
 
+		if (dragObject['direction'] != 'none' && dragObject['direction'] != direction) {
+			// change direction
 			while (dragObject['stack'].length > 1) {
 				var elem = dragObject['stack'].pop();
 				if (elem['cell'] != '') elem['cell'].removeClass('active-cell');
@@ -235,101 +191,51 @@ $(document).ready(function() {
 		dragObject['direction'] = direction;
 	}
 
-	function restore_cells(gameObject, dragObject) {
-		var height = gameObject['height'],
-			width = gameObject['width'],
-			array = gameObject['array'],
-			start_row = dragObject['start']['row'],
-			start_col = dragObject['start']['col'],
-			curr_row = dragObject['curr']['row'],
-			curr_col = dragObject['curr']['col'],
-			direction = dragObject['direction'],
-			distance = dragObject['distance'];
+	function update_cell(gameObject, dragObject) {
+		var direction = dragObject['direction'],
+			class_name = 'active-cell',
+			state = 'stable';
 
+		var curr = dragObject['curr'];
+		var elem = dragObject['stack'].pop();
+		dragObject['stack'].push(elem);
 
-		// if (direction == 'left') {
-		// 	c_init = curr_col;
-		// 	c_lim = start_col;
-		// 	r_init = start_row;
-		// 	r_lim = start_row + 1; // only run row loop once
-		// 	coef = 1;
-		// } else if (direction == 'right') {
-		// 	c_init = start_col - curr_col;
-		// 	c_lim = start_col;
-		// 	r_init = start_row;
-		// 	r_lim = start_row + 1; // only run row loop once
-		// 	coef = -1;
-		// }
+		// console.log('direction: ' + direction);
 
-		// var r_coef = sign(r_lim - r_init),
-		// 	c_coef = sign(c_lim - c_init);
-
-		// for (var r = r_init; r < r_lim; r += 1 * r_coef) {
-		// 	for (var c = c_init; c < c_lim; c += 1 * c_coef) {
-		// 		$(array[r][c]).toggleClass('active-cell');
-		// 	}
-		// }
-
-		if (direction == 'left') {
-			for (var c = start_col - distance; c < start_col; c++) {
-				$(array[start_row][c]).toggleClass('active-cell');
-			}
-		} else if (direction == 'right') {
-			for (var c = start_col + distance; c > start_col; c--) {
-				$(array[start_row][c]).toggleClass('active-cell');
-			}
-		} else if (direction == 'up') {
-			for (var r = start_row - distance; c < start_row; c++) {
-				$(array[r][start_col]).toggleClass('active-cell');
-			}
-		} else if (direction == 'down') {
-			for (var r = start_row + distance; c > start_row; c--) {
-				$(array[r][start_col]).toggleClass('active-cell');
-			}
+		
+		if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ) {
+			curr['row'] = dragObject['start']['row'];
+			curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
+			state = 'expanding';
+		} else if ( (direction == 'up' && curr.row < elem.row) || (direction == 'down' && curr.row > elem.row) ) {
+			curr['col'] = dragObject['start']['col'];
+			curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
+			state = 'expanding';
+		} else if ( (direction == 'left' && curr.col > elem.col) || (direction == 'right' && curr.col < elem.col) ||
+					(direction == 'up' && curr.row > elem.row) || (direction == 'down' && curr.row < elem.row)		) {
+			state = 'shrinking';
 		}
 
-	}
-
-	function update_cells(gameObject, dragObject) {
-		var height = gameObject['height'],
-			width = gameObject['width'],
-			array = gameObject['array'],
-			row = dragObject['start']['row'],
-			col = dragObject['start']['col'],
-			direction = dragObject['direction'],
-			distance = dragObject['distance'];
-
-		// if (direction == 'left') {
-		// 	for (var c = start_col; c > start_col - distance; c--) {
-		// 		$(array[start_row][c]).toggleClass('active-cell');
-		// 	}
-		// } else if (direction == 'right') {
-		// 	for (var c = start_col; c < start_col + distance; c++) {
-		// 		$(array[start_row][c]).toggleClass('active-cell');
-		// 	}
-		// } else if (direction == 'up') {
-		// 	for (var r = start_row; r > start_row - distance; r--) {
-		// 		$(array[r][start_col]).toggleClass('active-cell');
-		// 	}
-		// } else if (direction == 'dowm') {
-		// 	for (var r = start_row; r < start_row + distance; r++) {
-		// 		$(array[r][start_col]).toggleClass('active-cell');
-		// 	}
-		// }
-
-		if (direction == 'left' && col - 1 >= 0) {
-			$(array[row][col - distance]).addClass('active-cell');
+		// console.log('state: ' + state);
+		if (state == 'expanding') {
+			if (curr['cell'].hasClass(class_name)) curr['cell'] = '';
+			else curr['cell'].addClass(class_name);
+			dragObject['stack'].push(curr);
+		} else if (state == 'shrinking') {
+			dragObject['stack'].pop();
+			if (elem['cell'] != '') elem['cell'].removeClass(class_name);
 		}
-		else if (direction == 'right' && col + 1 < width) {
-			$(array[row][col + distance]).addClass('active-cell');
-		}
-		else if (direction == 'up' && row - 1 >= 0) {
-			$(array[row - distance][col]).addClass('active-cell');
-		}
-		else if (direction == 'down' && row + 1 < height) {
-			$(array[row + distance][col]).addClass('active-cell');
-		}
+		// pop cell off top of stack
+		// if left,
+			// if cell.col < curr.col, push cell back on.
+				// if curr.hasClass('active-cell'), push obj with no cell field
+				// else push new cell (start.row, curr.col)
+			// else if cell.col > curr.col, toggle cell
+		
 
+		console.log('real dragenter');
+		
+		dragObject['curr'] = curr; // TODO: do I need this?
 	}
 
 
