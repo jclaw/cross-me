@@ -1,0 +1,30 @@
+#gameboard {
+	border-collapse: collapse;
+    border-spacing: 0;
+
+}
+#gameboard td {
+	height: 20px;
+	width: 20px;
+	padding: 0px;
+	border: 1px solid black;
+	cursor: pointer;
+}
+
+#gameboard tr {
+	padding: 0px;
+}
+
+.active-cell {
+	background: black;
+}
+
+/*remove*/
+
+.mouseover {
+	background: red;
+}
+
+.dragstart {
+	background: green;
+}
