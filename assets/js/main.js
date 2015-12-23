@@ -141,6 +141,7 @@ $(document).ready(function() {
 	}
 
 	function update_direction(gameObject, dragObject) {
+
 		var row_delta = dragObject['curr']['row'] - dragObject['start']['row'],
 			col_delta = dragObject['curr']['col'] - dragObject['start']['col'],
 			direction = dragObject['direction'];
@@ -157,6 +158,7 @@ $(document).ready(function() {
 
 		if (dragObject['direction'] != 'none' && dragObject['direction'] != direction) {
 			// change direction
+			console.log('change_direction');
 			while (dragObject['stack'].length > 1) {
 				var elem = dragObject['stack'].pop();
 				if (elem['cell'] != '') elem['cell'].removeClass('active-cell');
@@ -181,23 +183,36 @@ $(document).ready(function() {
 
 
 		// debug_print_array(dragObject['stack'], 'stack');
+		// console.log(curr);
+		// console.log(elem);
 		if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ||
 			 (direction == 'up' && curr.row < elem.row) || (direction == 'down' && curr.row > elem.row)       ) {
 			// expanding
-
+			// console.log('expanding');
+			var coef, r_off, c_off, distance;
 			
 
 			if (direction == 'left' || direction == 'right') {
 				curr['row'] = dragObject['start']['row'];
+				coef = (direction == 'left') ? 1 : -1;
 			} else {
 				curr['col'] = dragObject['start']['col'];
+				coef = (direction == 'up') ? 1 : -1;
 			}
 			
-			
+			var debug_count = 0;
 			var count = 1;
 			while (true) {
-				
-				var cell = $(gameObject['array'][curr.row][curr.col + count]);
+				if (debug_count > 50) {console.log('ERROR'); break;}
+				if (direction == 'left' || direction == 'right') {
+					r_off = 0;
+					c_off = count * coef;
+				} else {
+					r_off = count * coef;
+					c_off = 0;
+				}
+				var cell = $(gameObject['array'][curr.row + r_off][curr.col + c_off]);
+				if (dragObject['stack'])
 				var top_stack = dragObject['stack'][dragObject['stack'].length - 1];
 
 				if (cell.hasClass(class_name) && top_stack['cell'] == '') {
@@ -206,21 +221,24 @@ $(document).ready(function() {
 					break;
 				} 
 				count++;
+				debug_count++;
 				console.log('catching up');
 				
 			}
-			count--;
+			// count--;
+			if (direction == 'left' || direction == 'right') {
+				r_off = 0;
+				c_off = count * coef;
+			} else {
+				r_off = count * coef;
+				c_off = 0;
+			}
+			// console.log('count: ' + count);
 
-			var start_cell = { cell: cell, row: curr.row, col: curr.col + count };
-
+			var start_cell = { cell: cell, row: curr.row + r_off, col: curr.col + c_off };
 
 
 			fill_stack(gameObject, dragObject, start_cell);
-
-			// curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
-			// if (curr['cell'].hasClass(class_name)) { curr['cell'] = ''; }
-			// else { curr['cell'].addClass(class_name); }
-			// dragObject['stack'].push(curr);
 
 
 
@@ -233,16 +251,35 @@ $(document).ready(function() {
 			// 	curr['col'] = dragObject['start']['col'];
 			// }
 			
+			
+			// var count = 1;
+			// while (true) {
+				
+			// 	var cell = $(gameObject['array'][curr.row][curr.col + count]);
+			// 	var top_stack = dragObject['stack'][dragObject['stack'].length - 1];
 
-			// curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
+			// 	if (cell.hasClass(class_name) && top_stack['cell'] == '') {
+			// 		dragObject['stack'].pop();
+			// 	} else if (cell.hasClass(class_name)) {
+			// 		break;
+			// 	} 
+			// 	count++;
+			// 	console.log('catching up');
+				
+			// }
+			// count--;
 
-			// if (curr['cell'].hasClass(class_name)) { curr['cell'] = ''; }
-			// else { curr['cell'].addClass(class_name); }
-			// dragObject['stack'].push(curr);
+			// var start_cell = { cell: cell, row: curr.row, col: curr.col + count };
+
+
+
+			// fill_stack(gameObject, dragObject, start_cell);
+
 
 		} else if ( (direction == 'left' && curr.col > elem.col) || (direction == 'right' && curr.col < elem.col) ||
 					(direction == 'up' && curr.row > elem.row) || (direction == 'down' && curr.row < elem.row)		) {
 			// shrinking
+			// console.log('shrinking');
 			dragObject['stack'].pop();
 			if (elem['cell'] != '') elem['cell'].removeClass(class_name);
 		}
@@ -253,17 +290,22 @@ $(document).ready(function() {
 	}
 
 	function fill_stack(gameObject, dragObject, init) {
+		// console.log('fill_stack');
+		// debug_print_array(dragObject['stack'], 'stack');
 		var start = init,
 			curr = dragObject['curr'],
 			row_delta = curr['row'] - start['row'],
 			col_delta = curr['col'] - start['col'],
 			direction = dragObject['direction'];
-
+		// console.log('start:');
+		// console.log(start);
+		// console.log('curr:');
+		// console.log(curr);
 		var coef, r_off, c_off, distance;
 		distance = (direction == 'left' || direction == 'right') ? Math.abs(col_delta) : Math.abs(row_delta);
 
-
-		for (var i = 0; i <= distance; i++) {
+		// console.log('distance: ' + distance);
+		for (var i = 1; i <= distance; i++) {
 			var elem = {};
 			if (direction == 'left' || direction == 'right') {
 				coef = (direction == 'left') ? -1 : 1;
@@ -285,6 +327,7 @@ $(document).ready(function() {
 			else { elem['cell'].addClass('active-cell'); }
 			dragObject['stack'].push(elem);
 		}
+		// debug_print_array(dragObject['stack'], 'stack');
 	}
 
 	function debug_print_array(array, name) {
