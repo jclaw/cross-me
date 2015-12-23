@@ -140,12 +140,9 @@ $(document).ready(function() {
 		// }
 	}
 
-
 	function update_direction(gameObject, dragObject) {
-		var start = dragObject['start'],
-			curr = dragObject['curr'],
-			row_delta = curr['row'] - start['row'],
-			col_delta = curr['col'] - start['col'],
+		var row_delta = dragObject['curr']['row'] - dragObject['start']['row'],
+			col_delta = dragObject['curr']['col'] - dragObject['start']['col'],
 			direction = dragObject['direction'];
 
 
@@ -164,29 +161,13 @@ $(document).ready(function() {
 				var elem = dragObject['stack'].pop();
 				if (elem['cell'] != '') elem['cell'].removeClass('active-cell');
 			}
-			var coef, r_off, c_off, distance;
-			distance = (direction == 'left' || direction == 'right') ? Math.abs(col_delta) : Math.abs(row_delta);
+			dragObject['direction'] = direction;
+			fill_stack(gameObject, dragObject);
 
-			for (var i = 1; i < distance; i++) {
-				var elem = {};
-				if (direction == 'left' || direction == 'right') {
-					coef = (direction == 'left') ? -1 : 1;
-					r_off = 0;
-					c_off = i * coef;
-				} else if (direction == 'up' || direction == 'down') {
-					coef = (direction == 'up') ? -1 : 1;
-					r_off = i * coef;
-					c_off = 0;
-				}
-				elem['cell'] = $(gameObject['array'][start.row + r_off][start.col + c_off]);
-				elem.row = start.row + r_off;
-				elem.col = start.col + c_off;
-				dragObject['stack'].push(elem);
-				elem['cell'].addClass('active-cell');
-			}
 			
+		} else {
+			dragObject['direction'] = direction;
 		}
-		dragObject['direction'] = direction;
 	}
 
 	function update_cells(gameObject, dragObject) {
@@ -198,24 +179,29 @@ $(document).ready(function() {
 		var elem = dragObject['stack'].pop();
 		dragObject['stack'].push(elem);
 
-		// console.log('direction: ' + direction);
 
-		
+				
 		if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ||
 			 (direction == 'up' && curr.row < elem.row) || (direction == 'down' && curr.row > elem.row)       ) {
-			
-			if (direction == 'left' || direction == 'right') { curr['row'] = dragObject['start']['row']; }
-			else { curr['col'] = dragObject['start']['col']; }
-			
-			curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
+			// expanding
 
-			if (curr['cell'].hasClass(class_name)) { curr['cell'] = ''; }
-			else { curr['cell'].addClass(class_name); }
-			dragObject['stack'].push(curr);
+			fill_stack(gameObject, dragObject);
+			// if (direction == 'left' || direction == 'right') {
+			// 	curr['row'] = dragObject['start']['row'];
+			// } else {
+			// 	curr['col'] = dragObject['start']['col'];
+			// }
+			
+
+			// curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
+
+			// if (curr['cell'].hasClass(class_name)) { curr['cell'] = ''; }
+			// else { curr['cell'].addClass(class_name); }
+			// dragObject['stack'].push(curr);
 
 		} else if ( (direction == 'left' && curr.col > elem.col) || (direction == 'right' && curr.col < elem.col) ||
 					(direction == 'up' && curr.row > elem.row) || (direction == 'down' && curr.row < elem.row)		) {
-			
+			// shrinking
 			dragObject['stack'].pop();
 			if (elem['cell'] != '') elem['cell'].removeClass(class_name);
 		}
@@ -225,7 +211,35 @@ $(document).ready(function() {
 		dragObject['curr'] = curr; // TODO: do I need this?
 	}
 
+	function fill_stack(gameObject, dragObject) {
+		var start = dragObject['start'],
+			curr = dragObject['curr'],
+			row_delta = curr['row'] - start['row'],
+			col_delta = curr['col'] - start['col'],
+			direction = dragObject['direction'];
 
+		var coef, r_off, c_off, distance;
+		distance = (direction == 'left' || direction == 'right') ? Math.abs(col_delta) : Math.abs(row_delta);
+
+
+		for (var i = 1; i <= distance; i++) {
+			var elem = {};
+			if (direction == 'left' || direction == 'right') {
+				coef = (direction == 'left') ? -1 : 1;
+				r_off = 0;
+				c_off = i * coef;
+			} else if (direction == 'up' || direction == 'down') {
+				coef = (direction == 'up') ? -1 : 1;
+				r_off = i * coef;
+				c_off = 0;
+			}
+			elem['cell'] = $(gameObject['array'][start.row + r_off][start.col + c_off]);
+			elem.row = start.row + r_off;
+			elem.col = start.col + c_off;
+			dragObject['stack'].push(elem);
+			elem['cell'].addClass('active-cell');
+		}
+	}
 
 	function debug_print_array(array, name) {
 		console.log(name.toUpperCase());
