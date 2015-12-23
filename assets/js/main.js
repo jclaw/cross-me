@@ -162,7 +162,7 @@ $(document).ready(function() {
 				if (elem['cell'] != '') elem['cell'].removeClass('active-cell');
 			}
 			dragObject['direction'] = direction;
-			fill_stack(gameObject, dragObject);
+			fill_stack(gameObject, dragObject, dragObject['start']);
 
 			
 		} else {
@@ -180,12 +180,53 @@ $(document).ready(function() {
 		dragObject['stack'].push(elem);
 
 
-				
+		// debug_print_array(dragObject['stack'], 'stack');
 		if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ||
 			 (direction == 'up' && curr.row < elem.row) || (direction == 'down' && curr.row > elem.row)       ) {
 			// expanding
 
-			fill_stack(gameObject, dragObject);
+			
+
+			if (direction == 'left' || direction == 'right') {
+				curr['row'] = dragObject['start']['row'];
+			} else {
+				curr['col'] = dragObject['start']['col'];
+			}
+			
+			
+			var count = 1;
+			while (true) {
+				
+				var cell = $(gameObject['array'][curr.row][curr.col + count]);
+				var top_stack = dragObject['stack'][dragObject['stack'].length - 1];
+
+				if (cell.hasClass(class_name) && top_stack['cell'] == '') {
+					dragObject['stack'].pop();
+				} else if (cell.hasClass(class_name)) {
+					break;
+				} 
+				count++;
+				console.log('catching up');
+				
+			}
+			count--;
+
+			var start_cell = { cell: cell, row: curr.row, col: curr.col + count };
+
+
+
+			fill_stack(gameObject, dragObject, start_cell);
+
+			// curr['cell'] = $(gameObject['array'][curr.row][curr.col]);
+			// if (curr['cell'].hasClass(class_name)) { curr['cell'] = ''; }
+			// else { curr['cell'].addClass(class_name); }
+			// dragObject['stack'].push(curr);
+
+
+
+
+
+
 			// if (direction == 'left' || direction == 'right') {
 			// 	curr['row'] = dragObject['start']['row'];
 			// } else {
@@ -205,14 +246,14 @@ $(document).ready(function() {
 			dragObject['stack'].pop();
 			if (elem['cell'] != '') elem['cell'].removeClass(class_name);
 		}
-
+		// debug_print_array(dragObject['stack'], 'stack');
 		console.log('real dragenter');
 		
 		dragObject['curr'] = curr; // TODO: do I need this?
 	}
 
-	function fill_stack(gameObject, dragObject) {
-		var start = dragObject['start'],
+	function fill_stack(gameObject, dragObject, init) {
+		var start = init,
 			curr = dragObject['curr'],
 			row_delta = curr['row'] - start['row'],
 			col_delta = curr['col'] - start['col'],
@@ -222,7 +263,7 @@ $(document).ready(function() {
 		distance = (direction == 'left' || direction == 'right') ? Math.abs(col_delta) : Math.abs(row_delta);
 
 
-		for (var i = 1; i <= distance; i++) {
+		for (var i = 0; i <= distance; i++) {
 			var elem = {};
 			if (direction == 'left' || direction == 'right') {
 				coef = (direction == 'left') ? -1 : 1;
@@ -236,8 +277,13 @@ $(document).ready(function() {
 			elem['cell'] = $(gameObject['array'][start.row + r_off][start.col + c_off]);
 			elem.row = start.row + r_off;
 			elem.col = start.col + c_off;
+			// dragObject['stack'].push(elem);
+			// elem['cell'].addClass('active-cell');
+
+
+			if (elem['cell'].hasClass('active-cell')) { elem['cell'] = ''; }
+			else { elem['cell'].addClass('active-cell'); }
 			dragObject['stack'].push(elem);
-			elem['cell'].addClass('active-cell');
 		}
 	}
 
