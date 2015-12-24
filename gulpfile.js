@@ -16,7 +16,7 @@ gulp.task('html', function () {
 });
 
 gulp.task('css', function() {
-  gulp.src('assets/css/**/*')
+  gulp.src('assets/css/*')
     .pipe(connect.reload());
 })
 
@@ -29,7 +29,7 @@ gulp.task('js', function() {
 
 gulp.task('watch', function() {
   gulp.watch('*.html', ['html']);
-  gulp.watch('assets/css/**/*', ['css']);
+  gulp.watch('assets/css/*', ['css']);
   gulp.watch('assets/js/**/*', ['js']);
 });
 

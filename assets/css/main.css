@@ -1,7 +1,6 @@
 #gameboard {
 	border-collapse: collapse;
     border-spacing: 0;
-
 }
 #gameboard td {
 	height: 20px;
@@ -9,6 +8,9 @@
 	padding: 0px;
 	border: 1px solid black;
 	cursor: pointer;
+	
+    transition: background .2s;
+
 }
 
 #gameboard tr {
@@ -28,3 +30,13 @@
 /*.dragstart {
 	background: green;
 }*/
+
+@keyframes fadein {
+    from {opacity: 0%;	}
+    to   {opacity: 100%;}
+}
+
+@keyframes fadeout {
+    from {opacity: 100%;}
+    to   {opacity: 0%;	}
+}
