@@ -2,7 +2,7 @@ $(document).ready(function() {
 	var gameboard = $('#gameboard');
 	var gameObject = {};
 
-	var jqxhr = $.getJSON("assets/json/image_alt.json", function(d) {
+	var jqxhr = $.getJSON("assets/json/image.json", function(d) {
 			console.log("success");
 			var data = d.board;
 
