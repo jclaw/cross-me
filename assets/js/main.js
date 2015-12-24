@@ -1,21 +1,38 @@
 $(document).ready(function() {
 	var gameboard = $('#gameboard');
-	init_game(gameboard);
+	var gameObject = {};
+
+	var jqxhr = $.getJSON("assets/json/image_alt.json", function(d) {
+			console.log("success");
+			var data = d.board;
+
+			if (data.height == data.row_data.length && data.width == data.col_data.length) {
+				gameObject['board_name'] = data.name;
+				gameObject['height'] = data.height;
+				gameObject['width'] = data.width;
+				gameObject['row_data'] = data.row_data;
+				gameObject['col_data'] = data.col_data;
+				init_game(gameboard, gameObject);
+				
+			} else {
+				alert("error! u suck");
+			}
+		});
 
 
-	function init_game(gameboard) {
+	function init_game(gameboard, gameObject) {
 		var boardComponents = {},
-			gameObject = {},
 			dragObject = {};
 
-		gameObject['width'] = 30;
-		gameObject['height'] = 16;
+		// gameObject['width'] = 30;
+		// gameObject['height'] = 16;
 		gameObject['array'] = [[]];
-		build_gameboard(gameboard, gameObject);
+		draw_board(gameboard, gameObject);
 
 
 		boardComponents['gameboard'] = gameboard;
-		boardComponents['cells'] = gameboard.find('td');
+		boardComponents['cells'] = gameboard.find('td.data');
+		// console.log(boardComponents['cells']);
 
 		build_gamearray(gameboard, gameObject, boardComponents['cells']);
 
@@ -121,20 +138,60 @@ $(document).ready(function() {
 		});
 	}
 
-	function build_gameboard(gameboard, gameObject) {
+	function draw_board(gameboard, gameObject) {
+		var row_data = gameObject['row_data'],
+			col_data = gameObject['col_data'];
+		var num_extra_columns = max_length(row_data);
+		var num_extra_rows = max_length(col_data);
+		gameObject['origin'] = {row: num_extra_rows, col: num_extra_columns};
+		// find maximum sized array for row data
+		// populate max size elements in each row, inserting data left aligned
+
 		var height = gameObject['height'],
-			width = gameObject['width'],
-			content = '';
-		for (var r = 0; r < height; r++) {
-			content += '<tr data-row="' + r + '">';
-			for (var c = 0; c < width; c++) {
+			width = gameObject['width'];
+
+		var content = '';
+		for (var r = 0; r < height + num_extra_rows; r++) {
+			
+			content += '<tr>';
+			
+			for (var c = 0; c < width + num_extra_columns; c++) {
 				// make cells draggable and include their index in data tags
-				content += '<td draggable=true data-index="' + r + ',' + c + '"></td>';
+				var true_r = r - num_extra_rows,
+					true_c = c - num_extra_columns;
+				if (true_r < 0 && true_c < 0) {
+					// printing blanks in the upper left corner
+					content += '<td></td>';
+				} else if (true_r < 0) {	
+					var length = col_data[true_c].length;
+					if (length + r < num_extra_columns) {
+						content += '<td></td>';
+					} else {
+						content += '<td>' + col_data[true_c][r - num_extra_columns + length] + '</td>';
+					}
+				} else if (true_c < 0) {
+					var length = row_data[true_r].length;
+					if (length + c < num_extra_rows) {
+						content += '<td></td>';
+					} else {
+						content += '<td>' + row_data[true_r][c - num_extra_rows + length] + '</td>';
+					}
+				} else {
+					content += '<td draggable=true class="data" data-index="' + true_r + ',' + true_c + '"></td>';
+				}
+				
 			}
 			content += '</tr>';
 		}
 		gameboard.append(content);
+	}
 
+	function max_length(array2D) {
+		var max = 0;
+		for (var i = 0; i < array2D.length; i++) {
+			if (array2D[i].length > max) max = array2D[i].length;
+		}
+		return max;
 	}
 
 	function build_gamearray(gameboard, gameObject, cells) {

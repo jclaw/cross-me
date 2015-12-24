@@ -27,10 +27,16 @@ gulp.task('js', function() {
     // .pipe(jshint.reporter('jshint-stylish'));
 });
 
+gulp.task('json', function() {
+  gulp.src('assets/json/*')
+    .pipe(connect.reload());
+});
+
 gulp.task('watch', function() {
   gulp.watch('*.html', ['html']);
   gulp.watch('assets/css/*', ['css']);
   gulp.watch('assets/js/**/*', ['js']);
+  gulp.watch('assets/json/*', ['json']);
 });
 
 gulp.task('serve', ['express'], function() {

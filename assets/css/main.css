@@ -1,3 +1,9 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+body {
+	font-family: "Roboto";
+}
+
 #gameboard {
 	border-collapse: collapse;
     border-spacing: 0;
@@ -7,10 +13,15 @@
 	width: 20px;
 	padding: 0px;
 	border: 1px solid black;
-	cursor: pointer;
+	text-align: center;
+	cursor: default;
 	
     transition: background .2s;
 
+}
+
+#gameboard td.data {
+	cursor: pointer;
 }
 
 #gameboard tr {
