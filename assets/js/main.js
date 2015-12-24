@@ -72,8 +72,16 @@ $(document).ready(function() {
 			dragObject['stack'].push(dragObject['start']);
 			
 			console.log('start');
-			//dragObject['stack'].push({cell: $(this), row: Number(start_data[0]), col: Number(start_data[1]) } );
 
+			// hide ghost image
+		    var crt = $(this).clone();
+		    crt.removeClass();
+		    crt.css('visibility', 'hidden');
+		    crt.css('height', '20px');
+		    crt.css('width', '20px');
+		    $('body').append(crt);
+		    crt = crt.get(0);
+		    event.originalEvent.dataTransfer.setDragImage(crt, 0, 0);
 
 		});
 
