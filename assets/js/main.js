@@ -144,7 +144,8 @@ $(document).ready(function() {
 		var height = gameObject['height'],
 			width = gameObject['width'];
 
-		var content = '';
+		var content = '',
+			border_mult = 5;
 		for (var r = 0; r < height + num_extra_rows; r++) {
 			
 			content += '<tr>';
@@ -156,24 +157,32 @@ $(document).ready(function() {
 				if (true_r < 0 && true_c < 0) {
 					// printing blanks in the upper left corner
 					content += '<td></td>';
-				} else if (true_r < 0) {	
-					var length = col_data[true_c].length;
-					if (length + r < num_extra_columns) {
-						content += '<td></td>';
-					} else {
-						content += '<td>' + col_data[true_c][r - num_extra_columns + length] + '</td>';
-					}
-				} else if (true_c < 0) {
-					var length = row_data[true_r].length;
-					if (length + c < num_extra_rows) {
-						content += '<td></td>';
-					} else {
-						content += '<td>' + row_data[true_r][c - num_extra_rows + length] + '</td>';
-					}
 				} else {
-					// make cells draggable and include their index in data tags
-					content += '<td draggable=true class="data" data-index="' + true_r + ',' + true_c + '"></td>';
+					content += '<td class="';
+					// create borders
+					if (true_r >= 0 && true_r % border_mult == 0) content += ' border-top';
+					if (true_c >= 0 && true_c % border_mult == 0) content += ' border-left';
+
+					if (true_r >= 0 && true_c >= 0) {
+						// make cells draggable and include their index in data tags
+						content += ' data" ';
+						content += 'draggable=true data-index="' + true_r + ',' + true_c + '">';
+					} else if (true_r < 0) {	
+						content += '">';
+						var length = col_data[true_c].length;
+						if (length + r >= num_extra_columns) {
+							content += col_data[true_c][r - num_extra_columns + length];
+						}
+					} else if (true_c < 0) {
+						content += '">';
+						var length = row_data[true_r].length;
+						if (length + c >= num_extra_rows) {
+							content += row_data[true_r][c - num_extra_rows + length];
+						}
+					}
+					content += '</td>';
 				}
+				
 				
 			}
 			content += '</tr>';

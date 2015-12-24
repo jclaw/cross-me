@@ -32,6 +32,27 @@ body {
 	background: black;
 }
 
+/*.data {
+	background: #FFD9D9;
+}
+*/
+
+/*.heavy-border-top {
+	border-top-width: 3px !important;
+}
+
+.heavy-border-left {
+	border-left-width: 3px !important;
+}*/
+
+.border-top {
+	border-top-width: 2px !important;
+}
+
+.border-left {
+	border-left-width: 2px !important;
+}
+
 /*remove*/
 
 .mouseover {
