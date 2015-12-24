@@ -24,15 +24,14 @@ $(document).ready(function() {
 		var boardComponents = {},
 			dragObject = {};
 
-		// gameObject['width'] = 30;
-		// gameObject['height'] = 16;
+
 		gameObject['array'] = [[]];
 		draw_board(gameboard, gameObject);
 
 
 		boardComponents['gameboard'] = gameboard;
 		boardComponents['cells'] = gameboard.find('td.data');
-		// console.log(boardComponents['cells']);
+
 
 		build_gamearray(gameboard, gameObject, boardComponents['cells']);
 
@@ -66,7 +65,6 @@ $(document).ready(function() {
 			dragObject['curr'] = {};
 			dragObject['start']['cell'] = $(this);
 			dragObject['direction'] = 'none';
-			// dragObject['distance'] = 0;
 			dragObject['stack'] = [];
 
 
@@ -107,8 +105,6 @@ $(document).ready(function() {
 
 			var curr = {},
 				curr_data;
-			// console.log('dragenter');
-
 
 			curr['cell'] = $(this);
 			curr_data = get_indices(curr['cell']);
@@ -144,8 +140,6 @@ $(document).ready(function() {
 		var num_extra_columns = max_length(row_data);
 		var num_extra_rows = max_length(col_data);
 		gameObject['origin'] = {row: num_extra_rows, col: num_extra_columns};
-		// find maximum sized array for row data
-		// populate max size elements in each row, inserting data left aligned
 
 		var height = gameObject['height'],
 			width = gameObject['width'];
@@ -156,7 +150,7 @@ $(document).ready(function() {
 			content += '<tr>';
 			
 			for (var c = 0; c < width + num_extra_columns; c++) {
-				// make cells draggable and include their index in data tags
+				
 				var true_r = r - num_extra_rows,
 					true_c = c - num_extra_columns;
 				if (true_r < 0 && true_c < 0) {
@@ -177,6 +171,7 @@ $(document).ready(function() {
 						content += '<td>' + row_data[true_r][c - num_extra_rows + length] + '</td>';
 					}
 				} else {
+					// make cells draggable and include their index in data tags
 					content += '<td draggable=true class="data" data-index="' + true_r + ',' + true_c + '"></td>';
 				}
 				
@@ -207,11 +202,6 @@ $(document).ready(function() {
 			gameObject['array'][r] = temp;
 		}
 		
-		// for (var r = 0; r < height; r++) {
-		// 	for (var c = 0; c < width; c++) {
-		// 		console.log($(gameObject['array'][r][c]).data('index'));
-		// 	}
-		// }
 	}
 
 	function update_direction(gameObject, dragObject) {
@@ -259,14 +249,9 @@ $(document).ready(function() {
 		var elem = dragObject['stack'].pop();
 		dragObject['stack'].push(elem);
 
-
-		// debug_print_array(dragObject['stack'], 'stack');
-		// console.log(curr);
-		// console.log(elem);
 		if ( (direction == 'left' && curr.col < elem.col) || (direction == 'right' && curr.col > elem.col) ||
 			 (direction == 'up' && curr.row < elem.row) || (direction == 'down' && curr.row > elem.row)       ) {
 			// expanding
-			// console.log('expanding');
 			var coef, r_off, c_off, distance;
 			
 
@@ -303,7 +288,6 @@ $(document).ready(function() {
 				console.log('catching up');
 				
 			}
-			// count--;
 			if (direction == 'left' || direction == 'right') {
 				r_off = 0;
 				c_off = count * coef;
@@ -311,7 +295,6 @@ $(document).ready(function() {
 				r_off = count * coef;
 				c_off = 0;
 			}
-			// console.log('count: ' + count);
 
 			var start_cell = { cell: cell, row: curr.row + r_off, col: curr.col + c_off };
 
@@ -322,34 +305,27 @@ $(document).ready(function() {
 		} else if ( (direction == 'left' && curr.col > elem.col) || (direction == 'right' && curr.col < elem.col) ||
 					(direction == 'up' && curr.row > elem.row) || (direction == 'down' && curr.row < elem.row)		) {
 			// shrinking
-			// console.log('shrinking');
 			dragObject['stack'].pop();
 			if (elem['cell'] != '' && task == 'on') elem['cell'].removeClass('active-cell');
 			else if (elem['cell'] != '' && task == 'off') elem['cell'].addClass('active-cell');
 		}
-		// debug_print_array(dragObject['stack'], 'stack');
+
 		console.log('real dragenter');
 		
 		dragObject['curr'] = curr; // TODO: do I need this?
 	}
 
 	function fill_stack(gameObject, dragObject, init) {
-		// console.log('fill_stack');
-		// debug_print_array(dragObject['stack'], 'stack');
 		var start = init,
 			curr = dragObject['curr'],
 			row_delta = curr['row'] - start['row'],
 			col_delta = curr['col'] - start['col'],
 			direction = dragObject['direction'],
 			task = dragObject['task'];
-		// console.log('start:');
-		// console.log(start);
-		// console.log('curr:');
-		// console.log(curr);
+
 		var coef, r_off, c_off, distance;
 		distance = (direction == 'left' || direction == 'right') ? Math.abs(col_delta) : Math.abs(row_delta);
 
-		// console.log('distance: ' + distance);
 		for (var i = 1; i <= distance; i++) {
 			var elem = {};
 			if (direction == 'left' || direction == 'right') {
@@ -364,21 +340,15 @@ $(document).ready(function() {
 			elem['cell'] = $(gameObject['array'][start.row + r_off][start.col + c_off]);
 			elem.row = start.row + r_off;
 			elem.col = start.col + c_off;
-			// dragObject['stack'].push(elem);
-			// elem['cell'].addClass('active-cell');
-
 
 			if ( is_cell_to_retain(elem['cell'], task) ) { 
 				elem['cell'] = ''; 
 			}
 			else { 
-
-				// this might not work
 				elem['cell'].toggleClass('active-cell'); 
 			}
 			dragObject['stack'].push(elem);
 		}
-		// debug_print_array(dragObject['stack'], 'stack');
 	}
 
 	function is_cell_to_retain(cell, task) {
