@@ -53,13 +53,22 @@ $(document).ready(function() {
 			dragObject['stack'] = [];
 
 
+
 			var start_data = get_indices(dragObject['start']['cell']);
 			dragObject['start']['row'] = start_data[0];
 			dragObject['start']['col'] = start_data[1];
 			dragObject['curr']['row'] = dragObject['start']['row'];
 			dragObject['curr']['col'] = dragObject['start']['col'];
 
-			dragObject['start']['cell'].addClass('active-cell');
+
+			if ($(this).hasClass('active-cell')) {
+				dragObject['start']['cell'].removeClass('active-cell');
+				dragObject['task'] = 'off';
+			} else {
+				dragObject['start']['cell'].addClass('active-cell');
+				dragObject['task'] = 'on';
+			}
+			
 			dragObject['stack'].push(dragObject['start']);
 			
 			console.log('start');
@@ -144,7 +153,8 @@ $(document).ready(function() {
 
 		var row_delta = dragObject['curr']['row'] - dragObject['start']['row'],
 			col_delta = dragObject['curr']['col'] - dragObject['start']['col'],
-			direction = dragObject['direction'];
+			direction = dragObject['direction'],
+			task = dragObject['task'];
 
 
 		if (Math.abs(col_delta) > Math.abs(row_delta)) {
@@ -161,7 +171,8 @@ $(document).ready(function() {
 			console.log('change_direction');
 			while (dragObject['stack'].length > 1) {
 				var elem = dragObject['stack'].pop();
-				if (elem['cell'] != '') elem['cell'].removeClass('active-cell');
+				if (elem['cell'] != '' && task == 'on') elem['cell'].removeClass('active-cell');
+				else if (elem['cell'] != '' && task == 'off') elem['cell'].addClass('active-cell');
 			}
 			dragObject['direction'] = direction;
 			fill_stack(gameObject, dragObject, dragObject['start']);
@@ -174,8 +185,10 @@ $(document).ready(function() {
 
 	function update_cells(gameObject, dragObject) {
 		var direction = dragObject['direction'],
+			task = dragObject['task'],
 			class_name = 'active-cell',
 			state = 'stable';
+
 
 		var curr = dragObject['curr'];
 		var elem = dragObject['stack'].pop();
@@ -215,9 +228,9 @@ $(document).ready(function() {
 				if (dragObject['stack'])
 				var top_stack = dragObject['stack'][dragObject['stack'].length - 1];
 
-				if (cell.hasClass(class_name) && top_stack['cell'] == '') {
+				if ( is_cell_to_retain(cell, task) && top_stack['cell'] == '') {
 					dragObject['stack'].pop();
-				} else if (cell.hasClass(class_name)) {
+				} else if ( is_cell_to_retain(cell, task) ) {
 					break;
 				} 
 				count++;
@@ -241,47 +254,13 @@ $(document).ready(function() {
 			fill_stack(gameObject, dragObject, start_cell);
 
 
-
-
-
-
-			// if (direction == 'left' || direction == 'right') {
-			// 	curr['row'] = dragObject['start']['row'];
-			// } else {
-			// 	curr['col'] = dragObject['start']['col'];
-			// }
-			
-			
-			// var count = 1;
-			// while (true) {
-				
-			// 	var cell = $(gameObject['array'][curr.row][curr.col + count]);
-			// 	var top_stack = dragObject['stack'][dragObject['stack'].length - 1];
-
-			// 	if (cell.hasClass(class_name) && top_stack['cell'] == '') {
-			// 		dragObject['stack'].pop();
-			// 	} else if (cell.hasClass(class_name)) {
-			// 		break;
-			// 	} 
-			// 	count++;
-			// 	console.log('catching up');
-				
-			// }
-			// count--;
-
-			// var start_cell = { cell: cell, row: curr.row, col: curr.col + count };
-
-
-
-			// fill_stack(gameObject, dragObject, start_cell);
-
-
 		} else if ( (direction == 'left' && curr.col > elem.col) || (direction == 'right' && curr.col < elem.col) ||
 					(direction == 'up' && curr.row > elem.row) || (direction == 'down' && curr.row < elem.row)		) {
 			// shrinking
 			// console.log('shrinking');
 			dragObject['stack'].pop();
-			if (elem['cell'] != '') elem['cell'].removeClass(class_name);
+			if (elem['cell'] != '' && task == 'on') elem['cell'].removeClass('active-cell');
+			else if (elem['cell'] != '' && task == 'off') elem['cell'].addClass('active-cell');
 		}
 		// debug_print_array(dragObject['stack'], 'stack');
 		console.log('real dragenter');
@@ -296,7 +275,8 @@ $(document).ready(function() {
 			curr = dragObject['curr'],
 			row_delta = curr['row'] - start['row'],
 			col_delta = curr['col'] - start['col'],
-			direction = dragObject['direction'];
+			direction = dragObject['direction'],
+			task = dragObject['task'];
 		// console.log('start:');
 		// console.log(start);
 		// console.log('curr:');
@@ -323,11 +303,21 @@ $(document).ready(function() {
 			// elem['cell'].addClass('active-cell');
 
 
-			if (elem['cell'].hasClass('active-cell')) { elem['cell'] = ''; }
-			else { elem['cell'].addClass('active-cell'); }
+			if ( is_cell_to_retain(elem['cell'], task) ) { 
+				elem['cell'] = ''; 
+			}
+			else { 
+
+				// this might not work
+				elem['cell'].toggleClass('active-cell'); 
+			}
 			dragObject['stack'].push(elem);
 		}
 		// debug_print_array(dragObject['stack'], 'stack');
+	}
+
+	function is_cell_to_retain(cell, task) {
+		return (task == 'on' && cell.hasClass('active-cell')) || (task == 'off' && !cell.hasClass('active-cell'));
 	}
 
 	function debug_print_array(array, name) {
