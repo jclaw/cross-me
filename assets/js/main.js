@@ -147,17 +147,16 @@ $(document).ready(function() {
 			col_data = gameObject['col_data'];
 		var num_extra_columns = max_length(row_data);
 		var num_extra_rows = max_length(col_data);
+		var tbody = gameboard.find('tbody');
 		gameObject['origin'] = {row: num_extra_rows, col: num_extra_columns};
 
 		var height = gameObject['height'],
 			width = gameObject['width'];
 
-		var content = '',
-			border_mult = 5;
+		var border_mult = 5;
 		for (var r = 0; r < height + num_extra_rows; r++) {
 			
-			// content += '<tr>';
-			gameboard.append('<tr>');
+			tbody.append('<tr>');
 			
 			for (var c = 0; c < width + num_extra_columns; c++) {
 				
@@ -165,9 +164,9 @@ $(document).ready(function() {
 					true_c = c - num_extra_columns;
 				if (true_r < 0 && true_c < 0) {
 					// printing blanks in the upper left corner
-					content = '<td></td>';
+					tbody.append($('<td></td>'));
 				} else {
-					content = '<td class="';
+					var content = '<td class="';
 					// create borders
 					if (true_r >= 0 && true_r % border_mult == 0) content += ' border-top';
 					if (true_c >= 0 && true_c % border_mult == 0) content += ' border-left';
@@ -177,34 +176,38 @@ $(document).ready(function() {
 						content += ' board-element" ';
 						content += 'draggable=true data-index="' + true_r + ',' + true_c + '">';
 						var cell = $(content + '</td>');
-						gameboard.append(cell);
-					} else if (true_r < 0) {
+						tbody.append(cell);
+					} else if (true_r < 0 || true_c < 0) {
 						content += ' data">';
-						var length = col_data[true_c].length;
-						if (length + r >= num_extra_columns) {
-							var elem = col_data[true_c][r - num_extra_columns + length];
-							var cell = $(content + elem.val + '</td>');
-							gameboard.append(cell);
-							elem.cell = cell;
+						var index1, index2, lim, arr;
+						if (true_r < 0) {
+							index1 = true_c;
+							index2 = r;
+							lim = num_extra_columns;
+							arr = col_data;
+						} else {
+							index1 = true_r;
+							index2 = c;
+							lim = num_extra_rows;
+							arr = row_data;
 						}
-					} else if (true_c < 0) {
-						content += ' data">';
-						var length = row_data[true_r].length;
-						if (length + c >= num_extra_rows) {
-							var elem = col_data[true_r][c - num_extra_rows + length];
+						var length = arr[index1].length;
+						
+						if (length + index2 >= lim) {
+							var elem = arr[index1][index2 - lim + length];
 							var cell = $(content + elem.val + '</td>');
-							gameboard.append(cell);
+							tbody.append(cell);
 							elem.cell = cell;
+						} else {
+							tbody.append($(content + '</td>'));
 						}
-					}
-					// content += '</td>';
+					} 
 				}
 				
 				
 			}
-			gameboard.append('</tr>');
+			tbody.append('</tr>');
 		}
-		// gameboard.append(content);
 	}
 
 	function max_length(array2D) {
