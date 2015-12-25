@@ -10,6 +10,11 @@ $(document).ready(function() {
 				gameObject['board_name'] = data.name;
 				gameObject['height'] = data.height;
 				gameObject['width'] = data.width;
+
+
+				objecterate(data.row_data);
+				objecterate(data.col_data);
+
 				gameObject['row_data'] = data.row_data;
 				gameObject['col_data'] = data.col_data;
 				init_game(gameboard, gameObject);
@@ -30,13 +35,14 @@ $(document).ready(function() {
 
 
 		boardComponents['gameboard'] = gameboard;
-		boardComponents['cells'] = gameboard.find('td.data');
+		boardComponents['cells'] = gameboard.find('td.board-element');
 
 
 		build_gamearray(gameboard, gameObject, boardComponents['cells']);
 
 		boardComponents['cells'].on('click', function() {
 			$(this).toggleClass('active-cell');
+			check_completion(gameObject, $(this));
 		});
 		
 		boardComponents['cells'].on('change', function(event) {
@@ -44,6 +50,7 @@ $(document).ready(function() {
 		});
 
 		boardComponents['cells'].on('mouseover', function(event) {
+
 			// console.log('over');
 			
 			// $(this).addClass('mouseover');
@@ -97,7 +104,7 @@ $(document).ready(function() {
 		    $('body').append(crt);
 		    crt = crt.get(0);
 		    event.originalEvent.dataTransfer.setDragImage(crt, 0, 0);
-
+		    check_completion(gameObject, $(this));
 		});
 
 
@@ -121,6 +128,7 @@ $(document).ready(function() {
 				update_cells(gameObject, dragObject);
 
 			}
+			check_completion(gameObject, $(this));
 		});
 
 		boardComponents['cells'].on('dragend', function(event) {
@@ -148,7 +156,8 @@ $(document).ready(function() {
 			border_mult = 5;
 		for (var r = 0; r < height + num_extra_rows; r++) {
 			
-			content += '<tr>';
+			// content += '<tr>';
+			gameboard.append('<tr>');
 			
 			for (var c = 0; c < width + num_extra_columns; c++) {
 				
@@ -156,38 +165,46 @@ $(document).ready(function() {
 					true_c = c - num_extra_columns;
 				if (true_r < 0 && true_c < 0) {
 					// printing blanks in the upper left corner
-					content += '<td></td>';
+					content = '<td></td>';
 				} else {
-					content += '<td class="';
+					content = '<td class="';
 					// create borders
 					if (true_r >= 0 && true_r % border_mult == 0) content += ' border-top';
 					if (true_c >= 0 && true_c % border_mult == 0) content += ' border-left';
 
 					if (true_r >= 0 && true_c >= 0) {
 						// make cells draggable and include their index in data tags
-						content += ' data" ';
+						content += ' board-element" ';
 						content += 'draggable=true data-index="' + true_r + ',' + true_c + '">';
-					} else if (true_r < 0) {	
-						content += '">';
+						var cell = $(content + '</td>');
+						gameboard.append(cell);
+					} else if (true_r < 0) {
+						content += ' data">';
 						var length = col_data[true_c].length;
 						if (length + r >= num_extra_columns) {
-							content += col_data[true_c][r - num_extra_columns + length];
+							var elem = col_data[true_c][r - num_extra_columns + length];
+							var cell = $(content + elem.val + '</td>');
+							gameboard.append(cell);
+							elem.cell = cell;
 						}
 					} else if (true_c < 0) {
-						content += '">';
+						content += ' data">';
 						var length = row_data[true_r].length;
 						if (length + c >= num_extra_rows) {
-							content += row_data[true_r][c - num_extra_rows + length];
+							var elem = col_data[true_r][c - num_extra_rows + length];
+							var cell = $(content + elem.val + '</td>');
+							gameboard.append(cell);
+							elem.cell = cell;
 						}
 					}
-					content += '</td>';
+					// content += '</td>';
 				}
 				
 				
 			}
-			content += '</tr>';
+			gameboard.append('</tr>');
 		}
-		gameboard.append(content);
+		// gameboard.append(content);
 	}
 
 	function max_length(array2D) {
@@ -357,6 +374,46 @@ $(document).ready(function() {
 				elem['cell'].toggleClass('active-cell'); 
 			}
 			dragObject['stack'].push(elem);
+		}
+	}
+
+	function check_completion(gameObject, cell) {
+		var start_data = get_indices(cell),
+			true_r = start_data[0],
+			true_c = start_data[1];
+			// r = true_r + gameObject['origin']['row'],
+			// c = true_c + gameObject['origin']['col'];
+		var row_arr = [];
+		var sum = 0;
+		for (var i = 0; i < gameObject['array'][true_r].length; i++) {
+			if ($(gameObject['array'][true_r][i]).hasClass('active-cell')) {
+				sum++;
+			} else if (sum != 0) {
+				row_arr.push(sum);
+				sum = 0;
+			}
+		}
+		if (sum != 0) row_arr.push(sum);
+		console.log(row_arr);
+		
+		compare_arrays(row_arr, gameObject['row_data'][true_r]);
+
+
+	}
+
+	function compare_arrays(arr1, arr2) {
+		
+		for (var i = 0; i < arr1.length; i++) {
+			if (arr1[i] != arr2[i]) return false;
+		}
+		return true;
+	}
+
+	function objecterate(arr) {
+		for (var i = 0; i < arr.length; i++) {
+			for (var j = 0; j < arr[i].length; j++) {
+				arr[i][j] = {val: arr[i][j]};
+			}
 		}
 	}
 

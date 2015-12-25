@@ -20,7 +20,7 @@ body {
 
 }
 
-#gameboard td.data {
+#gameboard td.board-element {
 	cursor: pointer;
 }
 
@@ -32,10 +32,6 @@ body {
 	background: black;
 }
 
-/*.data {
-	background: #FFD9D9;
-}
-*/
 
 /*.heavy-border-top {
 	border-top-width: 3px !important;
