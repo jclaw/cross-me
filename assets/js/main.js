@@ -405,11 +405,10 @@ $(document).ready(function() {
 	}
 
 	function compare_arrays(arr1, arr2) {
-		
+		// TODO: left off here
 		for (var i = 0; i < arr1.length; i++) {
-			if (arr1[i] != arr2[i]) return false;
+			
 		}
-		return true;
 	}
 
 	function objecterate(arr) {
