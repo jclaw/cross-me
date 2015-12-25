@@ -406,8 +406,8 @@ $(document).ready(function() {
 
 	function compare_arrays(arr1, arr2) {
 		// TODO: left off here
-		for (var i = 0; i < arr1.length; i++) {
-			
+		for (var i = 0; i < arr2.length; i++) {
+			arr2[i].cell.addClass('complete');
 		}
 	}
 

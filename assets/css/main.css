@@ -33,6 +33,10 @@ body {
 }
 
 
+.complete {
+	background: #EEE;
+}
+
 /*.heavy-border-top {
 	border-top-width: 3px !important;
 }
