@@ -404,11 +404,30 @@ $(document).ready(function() {
 
 	}
 
-	function compare_arrays(arr1, arr2) {
+	function compare_arrays(arr1, data) {
 		// TODO: left off here
-		for (var i = 0; i < arr2.length; i++) {
-			arr2[i].cell.addClass('complete');
+		var index = 0;
+		if (arr1.length > data.length) {
+			for (var i = 0; i < data.length; i++) { data[i].cell.removeClass('complete'); }
 		}
+		else {
+			for (var i = 0; i < data.length; i++) {
+				if (index < arr1.length) {
+					if (data[i].val == arr1[index]) {
+						data[i].cell.addClass('complete');
+						index++;
+					} else {
+						data[i].cell.removeClass('complete');
+					}
+					
+				} else {
+					data[i].cell.removeClass('complete');
+				}
+				
+			}
+
+		}
+
 	}
 
 	function objecterate(arr) {
