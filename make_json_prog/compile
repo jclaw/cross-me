@@ -1,0 +1,5 @@
+FLAGS="-O0 -Werror -Wfatal-errors -std=c99 -pedantic"
+
+gcc $FLAGS -o make_json make_json.c
+
+
