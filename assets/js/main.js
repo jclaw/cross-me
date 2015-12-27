@@ -2,7 +2,7 @@ $(document).ready(function() {
 	var gameboard = $('#gameboard');
 	var gameObject = {};
 
-	var jqxhr = $.getJSON("assets/json/image1.json", function(d) {
+	var jqxhr = $.getJSON("assets/json/levels/L2.json", function(d) {
 			console.log("success");
 			var data = d.board;
 
@@ -10,6 +10,7 @@ $(document).ready(function() {
 				gameObject['board_name'] = data.name;
 				gameObject['height'] = data.height;
 				gameObject['width'] = data.width;
+
 
 
 				objecterate(data.row_data);
@@ -147,6 +148,7 @@ $(document).ready(function() {
 			col_data = gameObject['col_data'];
 		var num_extra_columns = max_length(row_data);
 		var num_extra_rows = max_length(col_data);
+
 		var tbody = gameboard.find('tbody');
 		gameObject['origin'] = {row: num_extra_rows, col: num_extra_columns};
 
@@ -183,12 +185,12 @@ $(document).ready(function() {
 						if (true_r < 0) {
 							index1 = true_c;
 							index2 = r;
-							lim = num_extra_columns;
+							lim = num_extra_rows;
 							arr = col_data;
 						} else {
 							index1 = true_r;
 							index2 = c;
-							lim = num_extra_rows;
+							lim = num_extra_columns;
 							arr = row_data;
 						}
 						var length = arr[index1].length;
@@ -381,53 +383,64 @@ $(document).ready(function() {
 	}
 
 	function check_completion(gameObject, cell) {
+		// console.log('check_completion');
 		var start_data = get_indices(cell),
-			true_r = start_data[0],
-			true_c = start_data[1];
-			// r = true_r + gameObject['origin']['row'],
-			// c = true_c + gameObject['origin']['col'];
-		var row_arr = [];
-		var sum = 0;
-		for (var i = 0; i < gameObject['array'][true_r].length; i++) {
-			if ($(gameObject['array'][true_r][i]).hasClass('active-cell')) {
-				sum++;
-			} else if (sum != 0) {
-				row_arr.push(sum);
+			r = start_data[0],
+			c = start_data[1];
+
+		for (var n = 0; n < 2; n++) {
+
+			var user_data = [],
 				sum = 0;
+
+			var index, arr_name, game_data;
+			if (n == 0) {
+				// define vars for row
+				index = r;
+				arr_name = 'row_data';
+				game_data = gameObject['array'][r];
+				
+			} else if (n == 1) {
+				// define vars for col
+				index = c;
+				arr_name = 'col_data';
+				game_data = [];
+				for (var i = 0; i < gameObject['height']; i++) {
+					game_data.push(gameObject['array'][i][c]);
+				}
 			}
+
+			for (var i = 0; i < game_data.length; i++) {
+				if ($(game_data[i]).hasClass('active-cell')) {
+					sum++;
+				} else if (sum != 0) {
+					user_data.push(sum);
+					sum = 0;
+				}
+			}
+			if (sum != 0) user_data.push(sum);
+
+			compare_arrays(user_data, gameObject[arr_name][index]);
+
 		}
-		if (sum != 0) row_arr.push(sum);
-		console.log(row_arr);
-		
-		compare_arrays(row_arr, gameObject['row_data'][true_r]);
-
-
 	}
 
+
 	function compare_arrays(arr1, data) {
-		// TODO: left off here
 		var index = 0;
 		if (arr1.length > data.length) {
 			for (var i = 0; i < data.length; i++) { data[i].cell.removeClass('complete'); }
 		}
 		else {
 			for (var i = 0; i < data.length; i++) {
-				if (index < arr1.length) {
-					if (data[i].val == arr1[index]) {
-						data[i].cell.addClass('complete');
-						index++;
-					} else {
-						data[i].cell.removeClass('complete');
-					}
-					
+				if (index < arr1.length && data[i].val == arr1[index]) {
+					data[i].cell.addClass('complete');
+					index++;
 				} else {
 					data[i].cell.removeClass('complete');
 				}
-				
 			}
-
 		}
-
 	}
 
 	function objecterate(arr) {

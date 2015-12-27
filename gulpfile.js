@@ -1,6 +1,12 @@
 var gulp = require('gulp'),
     connect = require('gulp-connect');
 
+var paths = {
+  html: '*.html',
+  css: 'assets/css/*',
+  js: 'assets/js/**/*',
+  json: 'assets/json/**/*'
+};
 
 gulp.task('express', function(){
   var express = require('express');
@@ -11,32 +17,32 @@ gulp.task('express', function(){
 });
 
 gulp.task('html', function () {
-  gulp.src('*.html')
+  gulp.src(paths.html)
     .pipe(connect.reload());
 });
 
 gulp.task('css', function() {
-  gulp.src('assets/css/*')
+  gulp.src(paths.css)
     .pipe(connect.reload());
 })
 
 gulp.task('js', function() {
-  gulp.src('assets/js/**/*')
+  gulp.src(paths.js)
     .pipe(connect.reload());
     // .pipe(jshint('./.jshintrc'))
     // .pipe(jshint.reporter('jshint-stylish'));
 });
 
 gulp.task('json', function() {
-  gulp.src('assets/json/*')
+  gulp.src(paths.json)
     .pipe(connect.reload());
 });
 
 gulp.task('watch', function() {
-  gulp.watch('*.html', ['html']);
-  gulp.watch('assets/css/*', ['css']);
-  gulp.watch('assets/js/**/*', ['js']);
-  gulp.watch('assets/json/*', ['json']);
+  gulp.watch(paths.html, ['html']);
+  gulp.watch(paths.css, ['css']);
+  gulp.watch(paths.js, ['js']);
+  gulp.watch(paths.json, ['json']);
 });
 
 gulp.task('serve', ['express'], function() {
