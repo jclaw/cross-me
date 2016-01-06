@@ -14,7 +14,10 @@ $(document).ready(function() {
 		'lambda'
 	];
 	create_levels(levels);
-
+	$('#rboard_form').hide();
+	$('#rboard_form').toggleClass('open');
+	$('#rboard_form').toggleClass('open');
+	$('#rboard_form').show();
 
 	$('#slider').slider({
 		value: 50,
@@ -29,7 +32,8 @@ $(document).ready(function() {
 	$('#amount').text($('#slider').slider('value') + '%');
 
 	$('#random_board').click(function() {
-		$('#rboard_form').toggle();
+
+		$('#rboard').toggleClass('open');
 		$('#levels').hide();
 	});
 

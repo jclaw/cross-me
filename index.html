@@ -29,17 +29,19 @@
     
     <div id="site-content">
         <div class="small-container" id="content_selection">
+            
             <button id="random_board" class="btn btn-primary" type="button">Generate a random board</button>
-            <form id="rboard_form" style="display: none">
-                <div class="form-section">
-                Width: <input class="num-input" name="width" type="number" value="5" autofocus> Height: <input class="num-input" name="height" type="number" value="5"><br>
-                </div>
-                Amount of white space (more is harder): <span id="amount"></span>
-                <div id="slider"></div>
-                <button class="btn btn-primary" type="button" name="generate">Generate</button>
-            </form>
-            <div class="divider"> – OR – </div>
-            <button id="premade" class="btn btn-tertiary" type="button">Play a pre-made level</button>
+            <div id="rboard" class="btn-wrap">
+                <form id="rboard_form">Width: <input class="num-input" name="width" type="number" value="5" autofocus> Height: <input class="num-input" name="height" type="number" value="5"><br>
+                    
+                    Amount of white space (more is harder): <span id="amount"></span>
+                    <div id="slider"></div>
+                    <button class="btn btn-inv-primary" type="button" name="generate">Generate</button>
+                </form>
+            </div>
+            
+            <div class="divider" style="display: none"> – OR – </div>
+            <button id="premade" class="btn btn-tertiary" type="button" style="display: none">Play a pre-made level</button>
             <ol id="levels" style="display: none"></ol>
 
             

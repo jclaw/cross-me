@@ -47,7 +47,7 @@ gulp.task('watch', function() {
 
 gulp.task('serve', ['express'], function() {
   connect.server({
-    livereload: true,
+    livereload: false,
     // root: ''
   });
 });
