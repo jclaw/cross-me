@@ -21,11 +21,15 @@ $(document).ready(function() {
 	$('#rboard_form [name="generate"]').click(function() {
 		$('#content_selection').hide();
 		
-		var width = $('#rboard_form [name="width"]').val(),
-			height = $('#rboard_form [name="height"]').val(),
+		var w = parseInt($('#rboard_form [name="width"]').val()),
+			h = parseInt($('#rboard_form [name="height"]').val()),
 			whitespace = $('#slider').slider('value');
-		var data = generate_random_board(4, 5, whitespace);
+
+		var data = generate_random_board(w, h, whitespace);
+		
+		console.log(data);
 		build_data(data);
+
 	});
 
 	$('#premade').click(function() {
@@ -39,6 +43,7 @@ $(document).ready(function() {
 	});
 
 	function generate_random_board(width, height, whitespace) {
+		console.log('width: ' + width + ' height: ' + height);
 		var data,
 			board = [];
 		for (var r = 0; r < height; r++) {
