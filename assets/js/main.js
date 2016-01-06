@@ -11,8 +11,6 @@ $(document).ready(function() {
 				gameObject['height'] = data.height;
 				gameObject['width'] = data.width;
 
-
-
 				objecterate(data.row_data);
 				objecterate(data.col_data);
 
@@ -141,6 +139,9 @@ $(document).ready(function() {
 			console.log('end');
 			console.log(event.dataTransfer.dropEffect);
 		});
+
+
+		start_timer(gameObject);
 	}
 
 	function draw_board(gameboard, gameObject) {
@@ -210,6 +211,33 @@ $(document).ready(function() {
 			}
 			tbody.append('</tr>');
 		}
+	}
+
+	function start_timer() {
+		var time_object = {
+			timer: $('#timer'),
+			seconds: 0,
+			minutes: 0
+		};
+		run_timer(time_object);
+	}
+
+	function run_timer(time_object) {
+		var timer = time_object.timer,
+			seconds = time_object.seconds,
+			minutes = time_object.minutes,
+			t;
+		t = setTimeout(function() {
+			seconds++;
+			if (seconds >= 60) {
+				seconds = 0;
+				minutes++;
+			}
+			timer.text((minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));
+			time_object.seconds = seconds;
+			time_object.minutes = minutes;
+			run_timer(time_object);
+		}, 1000);
 	}
 
 	function max_length(array2D) {
