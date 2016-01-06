@@ -14,6 +14,16 @@ body {
 	text-align: center;
 }
 
+.small-container {
+	width: 50%;
+	margin: 0 auto;
+}
+
+.ui-slider {
+	width: 200px;
+	margin: 0 auto;
+}
+
 #timer {
 	margin-bottom: 5px;
 }
@@ -41,6 +51,10 @@ body {
 
 #gameboard tr {
 	padding: 0px;
+}
+
+.button {
+
 }
 
 .active-cell {

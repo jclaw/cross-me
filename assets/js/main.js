@@ -2,26 +2,62 @@ $(document).ready(function() {
 	var gameboard = $('#gameboard');
 	var gameObject = {};
 
-	var jqxhr = $.getJSON("assets/json/levels/L2.json", function(d) {
+	$('#slider').slider({
+		value: 50,
+		orientation: 'horizontal',
+		slide: function( event, ui ) {
+        	$('#amount').text( ui.value + '%' );
+      	}
+	});
+	$('#amount').text($('#slider').slider('value') + '%');
+
+	$('#random_board').click(function() {
+
+		$('#rboard_form').toggle();
+	});
+
+	$('#rboard_form [name="generate"]').click(function() {
+		$('#content_selection').hide();
+		
+		var width = $('#rboard_form [name="width"]').val(),
+			height = $('#rboard_form [name="height"]').val(),
+			whitespace = $('#slider').slider('value');
+		var data = generate_random_board(width, height, whitespace);
+		build_data(data);
+	});
+
+	$('#premade').click(function() {
+		$('#content_selection').hide();
+		var jqxhr = $.getJSON("assets/json/levels/L2.json", function(d) {
 			console.log("success");
 			var data = d.board;
-
-			if (data.height == data.row_data.length && data.width == data.col_data.length) {
-				gameObject['board_name'] = data.name;
-				gameObject['height'] = data.height;
-				gameObject['width'] = data.width;
-
-				objecterate(data.row_data);
-				objecterate(data.col_data);
-
-				gameObject['row_data'] = data.row_data;
-				gameObject['col_data'] = data.col_data;
-				init_game(gameboard, gameObject);
-				
-			} else {
-				alert("error! u suck");
-			}
+			console.log(data);
+			build_data(data);
 		});
+	});
+
+	function generate_random_board(width, height, whitespace) {
+		
+	}
+
+	function build_data(data) {
+		if (data.height == data.row_data.length && data.width == data.col_data.length) {
+			gameObject['board_name'] = data.name;
+			gameObject['height'] = data.height;
+			gameObject['width'] = data.width;
+
+			objecterate(data.row_data);
+			objecterate(data.col_data);
+
+			gameObject['row_data'] = data.row_data;
+			gameObject['col_data'] = data.col_data;
+			init_game(gameboard, gameObject);
+			
+		} else {
+			alert("error! u suck");
+		}
+	}
+	
 
 
 	function init_game(gameboard, gameObject) {
@@ -142,6 +178,7 @@ $(document).ready(function() {
 
 
 		start_timer(gameObject);
+		$('#game').show();
 	}
 
 	function draw_board(gameboard, gameObject) {

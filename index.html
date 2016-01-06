@@ -12,26 +12,46 @@
 <!--     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css"> -->
 
+
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/base/jquery-ui.min.css">
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/base/core.css">
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/base/base.css">
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/base/all.css">
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/base/slider.css">
     <link rel="stylesheet" href="assets/css/main.css">
+
 
 </head>
 <body>
     <div id="header">
         <h1>Nonogram Puzzle</h1>
     </div>
+    
     <div id="site-content">
-        <div>
-            <form>
+        <div class="small-container" id="content_selection">
+            <button id="random_board" type="button">Generate a random board</button>
+            <form id="rboard_form" style="display: none">
                 Generate a random board.<br>
-                Width: <input type="number" autofocus> Height: <input type="number">
+                Width: <input name="width" type="number" autofocus> Height: <input name="height" type="number"><br>
+                Amount of white space: <span id="amount"></span>
+                <div id="slider"></div>
+                <button class="button" type="button" name="generate">Generate</button>
             </form>
+            <div>OR</div>
+            <button id="premade" type="button">Play a premade game</button>
+
+            
         </div>
-        <div id="timer"></div>
-        <table id="gameboard">
-            <tbody>
-            </tbody>
-        </table>
-        <ul>
+        <div id="game" style="display: none">
+            <div id="timer">00:00</div>
+            <table id="gameboard">
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    
+
+        <ul style="display: none">
             <li>create random board generator: allow users to adjust height and width, maybe relative amounts of blocks filled in</li>
         </ul>
     </div>
@@ -55,6 +75,10 @@
 
 
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/jquery-ui/ui/core.js"></script>
+    <script src="bower_components/jquery-ui/ui/widget.js"></script>
+    <script src="bower_components/jquery-ui/ui/mouse.js"></script>
+    <script src="bower_components/jquery-ui/ui/slider.js"></script>
     <script src="assets/js/main.js"></script>
 
 </body>
