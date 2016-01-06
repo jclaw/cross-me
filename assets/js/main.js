@@ -20,6 +20,7 @@ $(document).ready(function() {
 		value: 50,
 		min: 20,
 		max: 80,
+		range: 'min',
 		orientation: 'horizontal',
 		slide: function( event, ui ) {
         	$('#amount').text( ui.value + '%' );
@@ -28,26 +29,29 @@ $(document).ready(function() {
 	$('#amount').text($('#slider').slider('value') + '%');
 
 	$('#random_board').click(function() {
-
 		$('#rboard_form').toggle();
+		$('#levels').hide();
 	});
 
 	$('#rboard_form [name="generate"]').click(function() {
 		$('#content_selection').hide();
-		
+
 		var w = parseInt($('#rboard_form [name="width"]').val()),
 			h = parseInt($('#rboard_form [name="height"]').val()),
 			whitespace = $('#slider').slider('value');
 
-		var data = generate_random_board(w, h, whitespace);
-		
-		console.log(data);
-		build_data(data);
+		if (w == NaN || h == NaN || w <= 0 || h <= 0) {
+			error('Please input a height and width and are greater than zero.');
+		} else {
+			var data = generate_random_board(w, h, whitespace);
+			build_data(data);
+		}
 
 	});
 
 	$('#premade').click(function() {
 		$('#levels').toggle();
+		$('#rboard_form').hide();
 	});
 
 	$('#levels a').click(function() {
@@ -65,7 +69,7 @@ $(document).ready(function() {
 
 	function create_levels() {
 		for (var i = 0; i < levels.length; i++) {
-			$('#levels').append('<li><a href="#" data-index="' + (i + 1) + '">' + levels[i] + '</a></li>');
+			$('#levels').append('<li><a href="#" data-index="' + (i + 1) + '">' + toTitleCase(levels[i]) + '</a></li>');
 		}
 	}
 
@@ -159,7 +163,7 @@ $(document).ready(function() {
 			init_game(gameboard, gameObject);
 			
 		} else {
-			alert("error! u suck");
+			alert("error! I suck");
 		}
 	}
 	
@@ -683,6 +687,10 @@ $(document).ready(function() {
 		var arr = $(cell).data('index').split(',');
 		for (var i = 0; i < arr.length; i++) { arr[i] = +arr[i]; } // to number
 		return arr;
+	}
+
+	function toTitleCase(str) {
+	    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 	}
 
 	function sign(x) { return x > 0 ? 1 : x < 0 ? -1 : 0; }
