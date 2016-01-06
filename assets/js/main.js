@@ -383,12 +383,11 @@ $(document).ready(function() {
 	}
 
 	function check_completion(gameObject, cell) {
-		// console.log('check_completion');
 		var start_data = get_indices(cell),
 			r = start_data[0],
 			c = start_data[1];
 
-		for (var n = 0; n < 2; n++) {
+		for (var n = 0; n < 1; n++) {
 
 			var user_data = [],
 				sum = 0;
@@ -427,19 +426,61 @@ $(document).ready(function() {
 
 
 	function compare_arrays(arr1, data) {
-		var index = 0;
-		if (arr1.length > data.length) {
-			for (var i = 0; i < data.length; i++) { data[i].cell.removeClass('complete'); }
+
+		var data_vals = [];
+		for (var i = 0; i < data.length; i++) {
+			data_vals[i] = data[i].val;
 		}
-		else {
+		if (arr1.length > data.length) {
+			remove_all_complete(data);
+		}
+		else if (same_array(arr1, data_vals)) {
 			for (var i = 0; i < data.length; i++) {
-				if (index < arr1.length && data[i].val == arr1[index]) {
+				data[i].cell.addClass('complete');
+			}
+		} else if (arr1.length == data.length) {
+			for (var i = 0; i < arr1.length; i++) {
+				if (arr1[i] == data[i].val) {
 					data[i].cell.addClass('complete');
-					index++;
 				} else {
 					data[i].cell.removeClass('complete');
 				}
 			}
+		} else {
+			var index = 0;
+
+			for (var i = 0; i < data.length; i++) {
+				console.log('index: ' + index + ' arr1.length: ' + arr1.length);
+				if (index < arr1.length) {
+					if (data[i].val == arr1[index]) {
+						data[i].cell.addClass('complete');
+						index++;
+					} else {
+						data[i].cell.removeClass('complete');
+					}
+				} else if (index == arr1.length) {
+					data[i].cell.removeClass('complete');
+					index++;
+				} else {
+					console.log('removing all');
+					remove_all_complete(data);
+					break;
+				}
+			}
+		}
+	}
+
+	function same_array(arr1, arr2) {
+		if (arr1.length != arr2.length) return false;
+		for (var i = 0; i < arr1.length; i++) {
+			if (arr1[i] != arr2[i]) return false;
+		}
+		return true;
+	}
+
+	function remove_all_complete(data) {
+		for (var i = 0; i < data.length; i++) {
+			data[i].cell.removeClass('complete');
 		}
 	}
 

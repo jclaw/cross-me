@@ -8,8 +8,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" value="notranslate">
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <!-- <link rel="icon" href="favicon.ico" type="image/x-icon"> -->
 
 <!--     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css"> -->
@@ -18,16 +16,29 @@
 
 </head>
 <body>
-    <div class="container-fluid">
+    <div id="header">
+        <h1>Nonogram Puzzle</h1>
+    </div>
+    <div id="site-content">
+        <div>
+            <form>
+                Generate a random board.<br>
+                Width: <input type="number" autofocus> Height: <input type="number">
+            </form>
+        </div>
         <table id="gameboard">
-        <tbody>
-        </tbody>
+            <tbody>
+            </tbody>
         </table>
+        <ul>
+            <li>create random board generator: allow users to adjust height and width, maybe relative amounts of blocks filled in</li>
+        </ul>
     </div>
 
 
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+    <!--
     <script>
         ! function (A, n, g, u, l, a, r) {
             A.GoogleAnalyticsObject = l, A[l] = A[l] || function () {
@@ -39,6 +50,7 @@
         ga('create', 'UA-XXXXX-X');
         ga('send', 'pageview');
     </script>
+    -->
 
 
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
