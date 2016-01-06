@@ -569,7 +569,7 @@ $(document).ready(function() {
 			r = start_data[0],
 			c = start_data[1];
 
-		for (var n = 0; n < 1; n++) {
+		for (var n = 0; n < 2; n++) {
 
 			var user_data = [],
 				sum = 0;
