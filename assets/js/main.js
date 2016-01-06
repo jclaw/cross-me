@@ -17,6 +17,8 @@ $(document).ready(function() {
 	];
 	create_levels(levels);
 
+	debug_log_data('00');
+
 	$('#slider').slider({
 		value: 50,
 		min: 20,
@@ -29,10 +31,11 @@ $(document).ready(function() {
 	});
 	$('#amount').text($('#slider').slider('value') + '%');
 
-	$('.btn-wrap').click(function() {
-		$(this).toggleClass('open');
-		$(this).find('> button').toggleClass('active');
-		$('.btn-wrap').not(this).removeClass('open');
+	$('.btn-wrap > button').click(function() {
+		$(this).toggleClass('active');
+		var parent = $(this).parent();
+		parent.toggleClass('open');
+		$('.btn-wrap').not(parent).removeClass('open');
 	});
 
 	$('#rboard_form [name="generate"]').click(function() {
@@ -54,19 +57,40 @@ $(document).ready(function() {
 	$('#levels button').click(function() {
 
 		var index = $(this).data('index');
-		index = index < 10 ? '0' + index : index;
-		var jqxhr = $.getJSON('assets/json/levels/L'+ index + '.json', function(d) {
+
+		build_data(levels[index]);
+		$('#content_selection').hide();
+	});
+
+	function debug_log_data(string) {
+		console.log(string);
+		var jqxhr = $.getJSON('assets/json/solutions/S'+ string + '.json', function(d) {
 			console.log("success");
 			var data = d.board;
-			console.log(data);
-			build_data(data);
-		});
-		$('#content_selection').hide();
-	})
+			var new_data = {};
+			new_data.name = data.name;
+			new_data.height = data.height;
+			new_data.width = data.width;
+			new_data.row_data = [];
+			new_data.col_data = [];
 
-	function create_levels() {
-		for (var i = 0; i < levels.length; i++) {
-			$('#levels').append('<li><button class="btn btn-inv-tertiary btn-square" data-index="' + (i + 1) + '">' + toTitleCase(levels[i]) + '</button></li>');
+			generate_data(new_data.row_data, data.solution, data.height, data.width, 'row');
+			generate_data(new_data.col_data, data.solution, data.height, data.width, 'col');
+			console.log('level ' + string);
+			console.log(JSON.stringify(new_data, null, '\t'));
+		});
+	}
+
+	function create_levels(num_levels) {
+		for (var i = 0; i < num_levels; i++) {
+			var index = 
+			var jqxhr = $.getJSON('assets/json/levels/L'+ i + '.json', function(d) {
+				console.log("success");
+				var data = d.board;
+				levels[i] = data;
+				$('#levels').append('<li><button class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(levels[i].name) + '</button></li>');
+			});
+			
 		}
 	}
 
@@ -91,11 +115,26 @@ $(document).ready(function() {
 		data.row_data = [];
 		data.col_data = [];
 
-		for (var r = 0; r < height; r++) {
+		generate_data(data.row_data, board, height, width, 'row');
+		generate_data(data.col_data, board, height, width, 'col');
+
+		print_board(board, width, height);
+
+		return data;
+	}
+
+	function generate_data(dest, src, height, width, order) {
+		var lim1,lim2,row_order;
+		row_order = order == 'row' ? true : false;
+		lim1 = row_order ? height : width;
+		lim2 = row_order ? width : height;
+
+		for (var d1 = 0; d1 < lim1; d1++) {
 			var sum = 0;
 			var temp = [];
-			for (var c = 0; c < width; c++) {
-				if (board[r][c] == 1) {
+			for (var d2 = 0; d2 < lim2; d2++) {
+				if ( (row_order && src[d1][d2] == 1) ||
+					 (!row_order && src[d2][d1] == 1) ) {
 					sum++;
 				} else if (sum != 0) {
 					temp.push(sum);
@@ -104,27 +143,8 @@ $(document).ready(function() {
 			}
 			if (sum != 0) temp.push(sum);
 			if (temp.length == 0) temp.push(0);
-			data.row_data[r] = temp;
+			dest[d1] = temp;
 		}
-
-		for (var c = 0; c < width; c++) {
-			var sum = 0;
-			var temp = [];
-			for (var r = 0; r < height; r++) {
-				if (board[r][c] == 1) {
-					sum++;
-				} else if (sum != 0) {
-					temp.push(sum);
-					sum = 0;
-				} 
-			}
-			if (sum != 0) temp.push(sum);
-			if (temp.length == 0) temp.push(0);
-			data.col_data[c] = temp;
-		}
-		print_board(board, width, height);
-
-		return data;
 	}
 
 	function print_board(board, width, height) {
