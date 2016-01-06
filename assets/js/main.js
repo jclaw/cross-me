@@ -1,6 +1,20 @@
 $(document).ready(function() {
 	var gameboard = $('#gameboard');
 	var gameObject = {};
+	var levels = [
+		'seal',
+		'apple',
+		'',
+		'',
+		'',
+		'',
+		'',
+		'',
+		'',
+		'lambda'
+	];
+	create_levels(levels);
+
 
 	$('#slider').slider({
 		value: 50,
@@ -33,14 +47,27 @@ $(document).ready(function() {
 	});
 
 	$('#premade').click(function() {
-		$('#content_selection').hide();
-		var jqxhr = $.getJSON("assets/json/levels/L2.json", function(d) {
+		$('#levels').toggle();
+	});
+
+	$('#levels a').click(function() {
+
+		var index = $(this).data('index');
+		index = index < 10 ? '0' + index : index;
+		var jqxhr = $.getJSON('assets/json/levels/L'+ index + '.json', function(d) {
 			console.log("success");
 			var data = d.board;
 			console.log(data);
 			build_data(data);
 		});
-	});
+		$('#content_selection').hide();
+	})
+
+	function create_levels() {
+		for (var i = 0; i < levels.length; i++) {
+			$('#levels').append('<li><a href="#" data-index="' + (i + 1) + '">' + levels[i] + '</a></li>');
+		}
+	}
 
 	function generate_random_board(width, height, whitespace) {
 		console.log('width: ' + width + ' height: ' + height);
@@ -601,7 +628,6 @@ $(document).ready(function() {
 			var index = 0;
 
 			for (var i = 0; i < data.length; i++) {
-				console.log('index: ' + index + ' arr1.length: ' + arr1.length);
 				if (index < arr1.length) {
 					if (data[i].val == arr1[index]) {
 						data[i].cell.addClass('complete');
@@ -655,7 +681,7 @@ $(document).ready(function() {
 
 	function get_indices(cell) { 
 		var arr = $(cell).data('index').split(',');
-		for (var i = 0; i < arr.length; i++) { arr[i] = +arr[i]; }
+		for (var i = 0; i < arr.length; i++) { arr[i] = +arr[i]; } // to number
 		return arr;
 	}
 
