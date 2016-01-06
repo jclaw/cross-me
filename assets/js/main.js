@@ -4,6 +4,8 @@ $(document).ready(function() {
 
 	$('#slider').slider({
 		value: 50,
+		min: 20,
+		max: 80,
 		orientation: 'horizontal',
 		slide: function( event, ui ) {
         	$('#amount').text( ui.value + '%' );
@@ -22,7 +24,7 @@ $(document).ready(function() {
 		var width = $('#rboard_form [name="width"]').val(),
 			height = $('#rboard_form [name="height"]').val(),
 			whitespace = $('#slider').slider('value');
-		var data = generate_random_board(width, height, whitespace);
+		var data = generate_random_board(4, 5, whitespace);
 		build_data(data);
 	});
 
@@ -37,10 +39,81 @@ $(document).ready(function() {
 	});
 
 	function generate_random_board(width, height, whitespace) {
-		
+		var data,
+			board = [];
+		for (var r = 0; r < height; r++) {
+			var temp = [];
+			for (var c = 0; c < width; c++) {
+				temp[c] = Math.random() * 100 > whitespace ? 1 : 0;
+			}
+			board[r] = temp;
+		}
+		console.log(board);
+
+		data = {
+			name: width + 'x' + height + ' random board',
+			height: height,
+			width: width
+		};
+		data.row_data = [];
+		data.col_data = [];
+
+		for (var r = 0; r < height; r++) {
+			var sum = 0;
+			var temp = [];
+			for (var c = 0; c < width; c++) {
+				if (board[r][c] == 1) {
+					sum++;
+				} else if (sum != 0) {
+					temp.push(sum);
+					sum = 0;
+				}
+			}
+			if (sum != 0) temp.push(sum);
+			if (temp.length == 0) temp.push(0);
+			data.row_data[r] = temp;
+		}
+
+		for (var c = 0; c < width; c++) {
+			var sum = 0;
+			var temp = [];
+			for (var r = 0; r < height; r++) {
+				if (board[r][c] == 1) {
+					sum++;
+				} else if (sum != 0) {
+					temp.push(sum);
+					sum = 0;
+				} 
+			}
+			if (sum != 0) temp.push(sum);
+			if (temp.length == 0) temp.push(0);
+			data.col_data[c] = temp;
+		}
+		print_board(board, width, height);
+
+		return data;
 	}
 
+	function print_board(board, width, height) {
+		var table = $('<table><tbody></tbody></table>'),
+			tbody = table.find('tbody');
+		table.css('border','1px');
+		for (var r = 0; r < height; r++) {
+			tbody.append('<tr>');
+			for (var c = 0; c < width; c++) {
+				var cls = board[r][c] == 1 ? 'active-cell': '';
+				tbody.append('<td class="' + cls + '"</td>');
+			}
+			tbody.append('</tr>');
+		}
+		
+
+		$('#site-content').prepend(table);
+	}
+	
+
 	function build_data(data) {
+		console.log('build_data');
 		if (data.height == data.row_data.length && data.width == data.col_data.length) {
 			gameObject['board_name'] = data.name;
 			gameObject['height'] = data.height;
@@ -218,27 +291,35 @@ $(document).ready(function() {
 						var cell = $(content + '</td>');
 						tbody.append(cell);
 					} else if (true_r < 0 || true_c < 0) {
-						content += ' data">';
+						// take care of displaying the game data along the top and left
+						
 						var index1, index2, lim, arr;
-						if (true_r < 0) {
+						
+						if (true_r < 0) {		// column data along the top
 							index1 = true_c;
 							index2 = r;
 							lim = num_extra_rows;
 							arr = col_data;
-						} else {
+						} else { 				// row data along the left
 							index1 = true_r;
 							index2 = c;
 							lim = num_extra_columns;
 							arr = row_data;
 						}
+
 						var length = arr[index1].length;
 						
 						if (length + index2 >= lim) {
+							if (arr[index1][index2 - lim + length].val == 0) {
+								content += ' complete';
+							}
+							content += ' data">';
 							var elem = arr[index1][index2 - lim + length];
 							var cell = $(content + elem.val + '</td>');
 							tbody.append(cell);
 							elem.cell = cell;
 						} else {
+							content += ' data">';
 							tbody.append($(content + '</td>'));
 						}
 					} 
