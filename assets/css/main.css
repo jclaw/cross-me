@@ -36,17 +36,28 @@ body {
 }
 
 #levels {
-	text-align: left;
-	display: inline-block;
+	list-style-type: none;
+	padding: 0px 30px 30px;
+}
+
+#levels li {
+	float: left;
+	margin: 5px;
 }
 
 #levels a {
 	text-decoration: none;
 	color: rgb(80, 184, 193);
+	height: 30px;
+	width: 80px;
+	background: white;
+	padding: 10px 10px;
+	border-radius: 4px;
 }
 
-form {
-	padding: 50px 30px 30px;
+#rboard_form {
+	padding: 0px 30px 30px;
+	position: relative;
 }
 
 .form-section {
@@ -101,39 +112,16 @@ tr {
 	padding: 0px;
 }
 
-.btn-wrap {
-	overflow: hidden;
-	position: absolute;
-	color: white;
-	max-height: 40px;
-    width: 100%;
-    margin-top: -40px;
-    border-radius: 2px;
-    background: rgb(222, 156, 43);
-    z-index: -100;
-    transition: max-height 1s ease-out;
-}
 
-.btn-wrap form {
-	position: relative;
-	/*left: 100px;*/
-	/*padding-top: 0px;*/
-}
-
-.btn-wrap.open {
-	max-height: 500px;
-	transition: max-height 1s ease-in;
-}
 
 .btn {
-	position: relative;
 	height: 40px;
 	width: 100%;
     background: rgb(222, 156, 43);
     color: white;
     border: none;
     border-radius: 2px;
-    padding: 6px 16px;
+    padding: 10px 16px;
     font-family: 'Roboto';
     font-size: 1em;
     transition: background 0.1s;
@@ -143,8 +131,42 @@ tr {
 	outline: none;
 }
 
-.btn:hover, .btn:focus {
+.btn:hover, .btn.active {
 	background: rgb(202, 140, 35);
+}
+
+.btn-wrap {
+	box-sizing: border-box;
+	overflow: hidden;
+	height: 40px;
+	width: 100%;
+    background: rgb(222, 156, 43);
+    color: white;
+    border: none;
+    border-radius: 2px;
+    font-family: 'Roboto';
+    font-size: 1em;
+    text-align: center;
+    z-index: -100;
+    transition: 0.5s;
+}
+
+/*.btn-wrap form {
+	position: relative;
+	left: 100px;
+}
+*/
+
+#rboard.btn-wrap.open {
+	height: 210px;
+}
+
+#premade.btn-wrap.open {
+	height: 320px;
+}
+
+.btn-wrap > div {
+	margin-top: 20px;
 }
 
 .btn-inv-primary {
@@ -160,7 +182,7 @@ tr {
 	background: rgb(222, 156, 43);
 }
 
-.btn.btn-primary:hover {
+.btn.btn-primary:hover, .btn.btn-primary.active {
 	background: rgb(202, 140, 35);
 }
 
@@ -176,8 +198,23 @@ tr {
 	background: rgb(80, 184, 193);
 }
 
-.btn.btn-tertiary:hover {
+.btn.btn-tertiary:hover, .btn.btn-tertiary.active {
 	background: rgb(59, 164, 173);
+}
+
+.btn-inv-tertiary {
+	background: white;
+	color: rgb(80, 184, 193);
+}
+
+.btn.btn-inv-tertiary:hover {
+	background: #eee;
+}
+
+.btn-square {
+	width: 71px;
+	height: 71px;
+	padding: 0;
 }
 
 .active-cell {

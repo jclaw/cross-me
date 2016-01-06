@@ -30,19 +30,22 @@
     <div id="site-content">
         <div class="small-container" id="content_selection">
             
-            <button id="random_board" class="btn btn-primary" type="button">Generate a random board</button>
+          <!--   <button id="random_board" class="btn btn-primary" type="button">Generate a random board</button> -->
             <div id="rboard" class="btn-wrap">
-                <form id="rboard_form">Width: <input class="num-input" name="width" type="number" value="5" autofocus> Height: <input class="num-input" name="height" type="number" value="5"><br>
+                <button class="btn">Generate a random board</button>
+                <div id="rboard_form">Width: <input class="num-input" name="width" type="number" value="5"> Height: <input class="num-input" name="height" type="number" value="5"><br>
                     
                     Amount of white space (more is harder): <span id="amount"></span>
                     <div id="slider"></div>
                     <button class="btn btn-inv-primary" type="button" name="generate">Generate</button>
-                </form>
+                </div>
             </div>
             
-            <div class="divider" style="display: none"> – OR – </div>
-            <button id="premade" class="btn btn-tertiary" type="button" style="display: none">Play a pre-made level</button>
-            <ol id="levels" style="display: none"></ol>
+            <div class="divider"> – OR – </div>
+            <div id="premade" class="btn-wrap btn-tertiary" type="button">
+                <button class="btn btn-tertiary">Play a pre-made level</button>
+                <ol id="levels"></ol>
+            </div>
 
             
         </div>

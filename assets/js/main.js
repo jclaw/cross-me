@@ -11,13 +11,11 @@ $(document).ready(function() {
 		'',
 		'',
 		'',
+		'',
+		'',
 		'lambda'
 	];
 	create_levels(levels);
-	$('#rboard_form').hide();
-	$('#rboard_form').toggleClass('open');
-	$('#rboard_form').toggleClass('open');
-	$('#rboard_form').show();
 
 	$('#slider').slider({
 		value: 50,
@@ -31,10 +29,10 @@ $(document).ready(function() {
 	});
 	$('#amount').text($('#slider').slider('value') + '%');
 
-	$('#random_board').click(function() {
-
-		$('#rboard').toggleClass('open');
-		$('#levels').hide();
+	$('.btn-wrap').click(function() {
+		$(this).toggleClass('open');
+		$(this).find('> button').toggleClass('active');
+		$('.btn-wrap').not(this).removeClass('open');
 	});
 
 	$('#rboard_form [name="generate"]').click(function() {
@@ -53,12 +51,7 @@ $(document).ready(function() {
 
 	});
 
-	$('#premade').click(function() {
-		$('#levels').toggle();
-		$('#rboard_form').hide();
-	});
-
-	$('#levels a').click(function() {
+	$('#levels button').click(function() {
 
 		var index = $(this).data('index');
 		index = index < 10 ? '0' + index : index;
@@ -73,7 +66,7 @@ $(document).ready(function() {
 
 	function create_levels() {
 		for (var i = 0; i < levels.length; i++) {
-			$('#levels').append('<li><a href="#" data-index="' + (i + 1) + '">' + toTitleCase(levels[i]) + '</a></li>');
+			$('#levels').append('<li><button class="btn btn-inv-tertiary btn-square" data-index="' + (i + 1) + '">' + toTitleCase(levels[i]) + '</button></li>');
 		}
 	}
 
