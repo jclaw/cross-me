@@ -4,7 +4,7 @@ $(document).ready(function() {
 	var levels = [];
 	create_levels(12);
 
-	// debug_log_data('03');
+	//debug_log_data('11');
 
 	$('#slider').slider({
 		value: 50,
@@ -385,6 +385,10 @@ $(document).ready(function() {
 			}
 			tbody.append('</tr>');
 		}
+
+		var width_str = gameboard.find('td').css('width'),
+			td_width = +width_str.slice(0, -2);
+		gameboard.css('margin-left', -1 * num_extra_columns * td_width + 'px');
 	}
 
 	function start_timer() {
