@@ -6,18 +6,7 @@ $(document).ready(function() {
 
 	//debug_log_data('11');
 
-	var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/random-board/', {test: 'hello', test2: 'world'}, function(data) {
-		alert( "success" );	
-	})
-	.done(function() {
-    	alert( "second success" );
-	})
-	.fail(function() {
-    	alert( "error" );
-	})
-	.always(function() {
-    	alert( "finished" );
-	});
+
 
 
 
@@ -51,8 +40,17 @@ $(document).ready(function() {
 		if (w == NaN || h == NaN || w <= 0 || h <= 0) {
 			error('Please input a height and width and are greater than zero.');
 		} else {
-			var data = generate_random_board(w, h, whitespace);
-			build_data(data);
+			var reqdata = {
+				width: w,
+				height: h,
+				whitespace: whitespace
+			};
+
+
+			var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/random-board/', reqdata, function(data) {
+				console.log(data);
+				build_data(data);
+			});
 		}
 
 	});
@@ -114,58 +112,6 @@ $(document).ready(function() {
 		});
 	}
 
-	function generate_random_board(width, height, whitespace) {
-		var data,
-			board = [];
-		for (var r = 0; r < height; r++) {
-			var temp = [];
-			for (var c = 0; c < width; c++) {
-				temp[c] = Math.random() * 100 > whitespace ? 1 : 0;
-			}
-			board[r] = temp;
-		}
-		console.log(board);
-
-		data = {
-			name: width + 'x' + height + ' random board',
-			height: height,
-			width: width
-		};
-		data.row_data = [];
-		data.col_data = [];
-
-		generate_data(data.row_data, board, height, width, 'row');
-		generate_data(data.col_data, board, height, width, 'col');
-
-		print_board(board, width, height);
-
-		return data;
-	}
-
-	function generate_data(dest, src, height, width, order) {
-		var lim1,lim2,row_order;
-		row_order = order == 'row' ? true : false;
-		lim1 = row_order ? height : width;
-		lim2 = row_order ? width : height;
-
-		for (var d1 = 0; d1 < lim1; d1++) {
-			var sum = 0;
-			var temp = [];
-			for (var d2 = 0; d2 < lim2; d2++) {
-				if ( (row_order && src[d1][d2] == 1) ||
-					 (!row_order && src[d2][d1] == 1) ) {
-					sum++;
-				} else if (sum != 0) {
-					temp.push(sum);
-					sum = 0;
-				}
-			}
-			if (sum != 0) temp.push(sum);
-			if (temp.length == 0) temp.push(0);
-			dest[d1] = temp;
-		}
-	}
-
 	function print_board(board, width, height) {
 		var table = $('<table><tbody></tbody></table>'),
 			tbody = table.find('tbody');
@@ -185,7 +131,6 @@ $(document).ready(function() {
 	
 
 	function build_data(data) {
-		console.log('build_data');
 		if (data.height == data.row_data.length && data.width == data.col_data.length) {
 			gameObject['board_name'] = data.name;
 			gameObject['height'] = data.height;
