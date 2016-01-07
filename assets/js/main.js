@@ -6,6 +6,22 @@ $(document).ready(function() {
 
 	//debug_log_data('11');
 
+	var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/random-board/', {test: 'hello', test2: 'world'}, function(data) {
+		alert( "success" );	
+	})
+	.done(function() {
+    	alert( "second success" );
+	})
+	.fail(function() {
+    	alert( "error" );
+	})
+	.always(function() {
+    	alert( "finished" );
+	});
+
+
+
+
 	$('#slider').slider({
 		value: 50,
 		min: 20,
