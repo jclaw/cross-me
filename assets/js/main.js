@@ -1,23 +1,10 @@
 $(document).ready(function() {
 	var gameboard = $('#gameboard');
 	var gameObject = {};
-	var levels = [
-		'seal',
-		'apple',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'',
-		'lambda'
-	];
-	create_levels(levels);
+	var levels = [];
+	create_levels(12);
 
-	debug_log_data('00');
+	// debug_log_data('03');
 
 	$('#slider').slider({
 		value: 50,
@@ -54,13 +41,7 @@ $(document).ready(function() {
 
 	});
 
-	$('#levels button').click(function() {
 
-		var index = $(this).data('index');
-
-		build_data(levels[index]);
-		$('#content_selection').hide();
-	});
 
 	function debug_log_data(string) {
 		console.log(string);
@@ -76,26 +57,48 @@ $(document).ready(function() {
 
 			generate_data(new_data.row_data, data.solution, data.height, data.width, 'row');
 			generate_data(new_data.col_data, data.solution, data.height, data.width, 'col');
+			
 			console.log('level ' + string);
-			console.log(JSON.stringify(new_data, null, '\t'));
+			var d = {board: new_data};
+			console.log(JSON.stringify(d, null, '\t'));
 		});
 	}
 
 	function create_levels(num_levels) {
-		for (var i = 0; i < num_levels; i++) {
-			var index = 
-			var jqxhr = $.getJSON('assets/json/levels/L'+ i + '.json', function(d) {
-				console.log("success");
-				var data = d.board;
-				levels[i] = data;
-				$('#levels').append('<li><button class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(levels[i].name) + '</button></li>');
+		recursive_JSON_request(0, num_levels);
+
+	}
+
+	function recursive_JSON_request(index, max) {
+		if (index >= max) return;
+		var i = index < 10 ? '0' + index : index.toString();
+		var jqxhr = $.getJSON('assets/json/levels/L'+ i + '.json', function(d) {
+		
+		})
+		.done(function(d) {
+			levels[index] = d.board;
+		})
+		.fail(function() {
+
+			levels[index] = {name: ''};
+		})
+		.always(function() {
+			var li = $('<li><button class="btn btn-inv-tertiary btn-square" data-index="' + index + '">' + toTitleCase(levels[index].name) + '</button></li>');
+
+			li.find('button').click(function() {
+				console.log($(this));
+				var index = $(this).data('index');
+				console.log('clicked: ' + index);
+				build_data(levels[index]);
+				$('#content_selection').hide();
 			});
-			
-		}
+			$('#levels').append(li);
+			index++;
+			recursive_JSON_request(index, max);
+		});
 	}
 
 	function generate_random_board(width, height, whitespace) {
-		console.log('width: ' + width + ' height: ' + height);
 		var data,
 			board = [];
 		for (var r = 0; r < height; r++) {

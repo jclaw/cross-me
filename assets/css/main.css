@@ -43,16 +43,7 @@ body {
 #levels li {
 	float: left;
 	margin: 5px;
-}
-
-#levels a {
-	text-decoration: none;
-	color: rgb(80, 184, 193);
-	height: 30px;
-	width: 80px;
-	background: white;
-	padding: 10px 10px;
-	border-radius: 4px;
+	height: 71px;
 }
 
 #rboard_form {
