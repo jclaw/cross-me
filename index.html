@@ -26,29 +26,38 @@
     <div id="header">
         <h1>Nonogram Puzzle</h1>
     </div>
-    
+
     <div id="site-content">
+
+    <div class="start-screen page">
         <div class="small-container" id="content_selection">
             
           <!--   <button id="random_board" class="btn btn-primary" type="button">Generate a random board</button> -->
             <div id="rboard" class="btn-wrap">
                 <button class="btn">Generate a random board</button>
-                <div id="rboard_form">Width: <input class="num-input" name="width" type="number" value="5"> Height: <input class="num-input" name="height" type="number" value="5"><br>
+                <div id="rboard_form">
+                    <div class="container">
+                        <span>Width: <input class="num-input" name="width" type="number" value="5"></span>
+                        <span>Height: <input class="num-input" name="height" type="number" value="5"></span>
+                    </div>
                     
                     Amount of white space (more is harder): <span id="amount"></span>
                     <div id="slider"></div>
-                    <button class="btn btn-inv-primary" type="button" name="generate">Generate</button>
+                    <a href="#game" class="btn btn-inv-primary" type="button" name="generate">Generate</a>
                 </div>
             </div>
             
             <div class="divider"> – OR – </div>
             <div id="premade" class="btn-wrap btn-tertiary" type="button">
-                <button class="btn btn-tertiary">Play a pre-made level</button>
+                <a class="btn btn-tertiary">Play a pre-made level</a>
                 <ol id="levels"></ol>
             </div>
 
             
         </div>
+    </div>
+
+    <div class="game-screen page">
         <div id="game" style="display: none">
             <div id="timer">00:00</div>
             <div id="game-wrapper">
@@ -58,14 +67,9 @@
                 </table>
             </div>
         </div>
-    
-
-        <ul style="display: none">
-            <li>create random board generator: allow users to adjust height and width, maybe relative amounts of blocks filled in</li>
-        </ul>
     </div>
 
-
+    </div>
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
     <!--

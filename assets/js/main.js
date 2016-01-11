@@ -6,10 +6,73 @@ $(document).ready(function() {
 
 	//debug_log_data('11');
 
+	/*
+	$(window).on('hashchange', function(){
+		// On every hash change the render function is called with the new hash.
+		// This is how the navigation of our app happens.
+		render(window.location.hash);
+	});
+
+	function render(url) {
+		// This function decides what type of page to show 
+		// depending on the current url hash value.
+		var temp = url.split('/')[0];
+		$('.main-content .page').removeClass('visible');
+
+		var map = {
+
+			// The Homepage.
+			'': function() {
+
+				// TODO: reset game here
 
 
+				// Clear the filters object, uncheck all checkboxes, show all the products
+				// filters = {};
+				// checkboxes.prop('checked',false);
 
+				renderStartScreen();
+			},
 
+			// Game page.
+			'#game': function() {
+
+				// Establish whether the game is a level or random
+				var type = url.split('#game/')[1].trim();
+				if (type == 'random') {
+					// request random from server
+				} else {
+					// request level from server
+				}
+				renderGame(levels[index]);
+			}
+		};
+
+		// Execute the needed function depending on the url keyword (stored in temp).
+		if(map[temp]){
+			map[temp]();
+		}
+		// If the keyword isn't listed in the above - render the error page.
+		else {
+			renderErrorPage();
+		}
+
+	}
+
+	function renderStartScreen() {
+		// Hides other pages and shows the starting screen.
+	}
+
+	function renderGame(data) {
+		// Hides other pages and shows the game with appropriate data.
+		build_data(data);
+	}
+
+	function renderErrorPage(){
+	    var page = $('.error');
+	    page.addClass('visible');
+  	}
+  	*/
 
 	$('#slider').slider({
 		value: 50,
@@ -23,14 +86,16 @@ $(document).ready(function() {
 	});
 	$('#amount').text($('#slider').slider('value') + '%');
 
-	$('.btn-wrap > button').click(function() {
+	$('.btn-wrap > .btn').click(function() {
 		$(this).toggleClass('active');
+		$('.btn').not(this).removeClass('active');
 		var parent = $(this).parent();
 		parent.toggleClass('open');
 		$('.btn-wrap').not(parent).removeClass('open');
 	});
 
 	$('#rboard_form [name="generate"]').click(function() {
+		console.log('here');
 		$('#content_selection').hide();
 
 		var w = parseInt($('#rboard_form [name="width"]').val()),
@@ -46,7 +111,6 @@ $(document).ready(function() {
 				whitespace: whitespace
 			};
 
-
 			var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/random-board/', reqdata, function(data) {
 				console.log(data);
 				build_data(data);
@@ -54,7 +118,6 @@ $(document).ready(function() {
 		}
 
 	});
-
 
 
 	function debug_log_data(string) {
@@ -78,38 +141,34 @@ $(document).ready(function() {
 		});
 	}
 
+	
+
 	function create_levels(num_levels) {
-		recursive_JSON_request(0, num_levels);
+		// recursive_JSON_request(0, num_levels);
+		console.log('creating levels');
 
-	}
+		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/levels', function(data) {
+			console.log(data);
+			for (var i = 0; i < data.length; i++) {
+				var li = $('<li><a class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(data[i].name) + '</a></li>');
+				li.find('.btn').click(function(e) {
+					// TODO: do I need this?
+					// e.preventDefault();
 
-	function recursive_JSON_request(index, max) {
-		if (index >= max) return;
-		var i = index < 10 ? '0' + index : index.toString();
-		var jqxhr = $.getJSON('assets/json/levels/L'+ i + '.json', function(d) {
-		
-		})
-		.done(function(d) {
-			levels[index] = d.board;
-		})
-		.fail(function() {
-
-			levels[index] = {name: ''};
-		})
-		.always(function() {
-			var li = $('<li><button class="btn btn-inv-tertiary btn-square" data-index="' + index + '">' + toTitleCase(levels[index].name) + '</button></li>');
-
-			li.find('button').click(function() {
-				console.log($(this));
-				var index = $(this).data('index');
-				console.log('clicked: ' + index);
-				build_data(levels[index]);
-				$('#content_selection').hide();
-			});
-			$('#levels').append(li);
-			index++;
-			recursive_JSON_request(index, max);
+					var index = $(this).data('index');
+					console.log('clicked: ' + index);
+					// TODO: comment this in when implementing hashes
+					//window.location.hash = 'game/level/' + index;
+					
+					// TODO: comment these out when implementing hashes
+					build_data(data[index]);
+					$('#content_selection').hide();
+				});
+				$('#levels').append(li);
+			}
 		});
+
+		// $(window).trigger('hashchange');
 	}
 
 	function print_board(board, width, height) {
