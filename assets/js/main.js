@@ -1,24 +1,58 @@
-$(document).ready(function() {
+$(function() {
 	var gameboard = $('#gameboard');
 	var gameObject = {};
-	var levels = [];
-	create_levels(12);
+	var levels = [],
+		num_levels = 12;
+	create_levels(num_levels);
+
+	var slider_min = 20,
+		slider_max = 80;
 
 	//debug_log_data('11');
 
-	/*
+	function create_levels(num_levels) {
+		console.log('creating levels');
+
+		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/levels', function(data) {
+			console.log(data);
+			levels = data; // TODO: is this right?
+			for (var i = 0; i < data.length; i++) {
+				var li = $('<li><a class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(data[i].name) + '</a></li>');
+				li.find('.btn').click(function(e) {
+					e.preventDefault();
+
+					var index = $(this).data('index');
+					console.log('clicked: ' + index);
+					window.location.hash = 'game/level/' + index + 1;
+					
+				});
+				$('#levels').append(li);
+			}
+		});
+		console.log('triggering');
+		$(window).trigger('hashchange');
+	}
+
+	render(window.location.hash);
+
 	$(window).on('hashchange', function(){
 		// On every hash change the render function is called with the new hash.
 		// This is how the navigation of our app happens.
+		console.log('hashchange');
+		console.log(window.location);
 		render(window.location.hash);
+
 	});
+
 
 	function render(url) {
 		// This function decides what type of page to show 
 		// depending on the current url hash value.
 		var temp = url.split('/')[0];
+		console.log('temp:');
+		console.log(temp);
 		$('.main-content .page').removeClass('visible');
-
+		console.log('render');
 		var map = {
 
 			// The Homepage.
@@ -36,15 +70,26 @@ $(document).ready(function() {
 
 			// Game page.
 			'#game': function() {
-
+				console.log('rendering game');
 				// Establish whether the game is a level or random
-				var type = url.split('#game/')[1].trim();
-				if (type == 'random') {
-					// request random from server
+				var hash = url.split('#game/')[1].trim(),
+					data = hash.split('/'),
+					type = data[0].trim();
+				console.log(data);
+				console.log(type);
+				if (type && type == 'random' && data.length == 4) {
+					try { mapRandom(data); } 
+					catch (err) { alert(err); }
+					
+				} else if (type && type == 'level' && data.length == 2) {
+					try { mapLevels(data); }
+					catch (err) { alert(err); }
 				} else {
-					// request level from server
+					// go to error page
+					alert('error');
 				}
-				renderGame(levels[index]);
+				
+
 			}
 		};
 
@@ -59,25 +104,76 @@ $(document).ready(function() {
 
 	}
 
+	function mapRandom(data) {
+		// sanitize data
+
+		for (var i = 1; i < data.length; i++) {
+			data[i] = parseInt(data[i]);
+			if (data[i] == NaN) throw 'Please input numbers only.';
+		};
+
+		var max_width = 50,
+			max_height = 30;
+		
+		if (data[1] > max_width || data[1] <= 0) {
+			throw 'Please input a width less than ' + max_width + ' and greater than 0.';
+		}
+		if (data[2] > max_height || data[2] <= 0) {
+			throw 'Please input a height less than ' + max_height + ' and greater than 0.';
+		}
+		if (data[3] > slider_max || data[3] < slider_min) {
+			throw 'Please input a whitespace value less than ' + slider_max + ' and greater than ' + slider_min + '.';
+		}
+		// make request
+		var reqdata = {
+			width: data[1],
+			height: data[2],
+			whitespace: data[3]
+		};
+
+		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/random-board/', reqdata, function(d) {
+			console.log(d);
+			renderGame(d);
+		});
+	}
+
+	function mapLevels(data) {
+		// sanitize data
+		data[1] = parseInt(data[1]);
+		if (data[1] == NaN) throw 'Please input numbers only.';
+
+		if (data[1] > num_levels || data[1] <= 0) {
+			throw data[1] + ' is not a valid level';
+		}
+		var index = data[1] - 1;
+		console.log('rendering level ' + index);
+		renderGame(levels[index]);
+	}
+
 	function renderStartScreen() {
 		// Hides other pages and shows the starting screen.
+		console.log('renderStartScreen');
+		$('.page').removeClass('visible');
+		$('.start-screen').addClass('visible');
 	}
 
 	function renderGame(data) {
 		// Hides other pages and shows the game with appropriate data.
 		build_data(data);
+		$('.page').not($('.game-screen')).removeClass('visible');
+		$('.game-screen').addClass('visible');
 	}
 
 	function renderErrorPage(){
 	    var page = $('.error');
 	    page.addClass('visible');
   	}
-  	*/
+  	
 
 	$('#slider').slider({
 		value: 50,
-		min: 20,
-		max: 80,
+		min: slider_min,
+		max: slider_max,
 		range: 'min',
 		orientation: 'horizontal',
 		slide: function( event, ui ) {
@@ -95,7 +191,6 @@ $(document).ready(function() {
 	});
 
 	$('#rboard_form [name="generate"]').click(function() {
-		console.log('here');
 		$('#content_selection').hide();
 
 		var w = parseInt($('#rboard_form [name="width"]').val()),
@@ -105,16 +200,8 @@ $(document).ready(function() {
 		if (w == NaN || h == NaN || w <= 0 || h <= 0) {
 			error('Please input a height and width and are greater than zero.');
 		} else {
-			var reqdata = {
-				width: w,
-				height: h,
-				whitespace: whitespace
-			};
+			window.location.hash = 'game/random/' + w + '/' + h + '/' + whitespace;
 
-			var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/random-board/', reqdata, function(data) {
-				console.log(data);
-				build_data(data);
-			});
 		}
 
 	});
@@ -143,33 +230,7 @@ $(document).ready(function() {
 
 	
 
-	function create_levels(num_levels) {
-		// recursive_JSON_request(0, num_levels);
-		console.log('creating levels');
 
-		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/levels', function(data) {
-			console.log(data);
-			for (var i = 0; i < data.length; i++) {
-				var li = $('<li><a class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(data[i].name) + '</a></li>');
-				li.find('.btn').click(function(e) {
-					// TODO: do I need this?
-					// e.preventDefault();
-
-					var index = $(this).data('index');
-					console.log('clicked: ' + index);
-					// TODO: comment this in when implementing hashes
-					//window.location.hash = 'game/level/' + index;
-					
-					// TODO: comment these out when implementing hashes
-					build_data(data[index]);
-					$('#content_selection').hide();
-				});
-				$('#levels').append(li);
-			}
-		});
-
-		// $(window).trigger('hashchange');
-	}
 
 	function print_board(board, width, height) {
 		var table = $('<table><tbody></tbody></table>'),
