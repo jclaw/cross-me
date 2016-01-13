@@ -34,14 +34,14 @@ $(function() {
 			}
 		});
 
-		$(window).trigger('hashchange');
 	}
 	initialize();
-	
+	$(window).trigger('hashchange');
 
-	$(window).on('hashchange', function(){
+	$(window).on('hashchange', function(e){
 		// On every hash change the render function is called with the new hash.
 		// This is how the navigation of our app happens.
+
 		render(window.location.hash);
 
 	});
@@ -55,12 +55,14 @@ $(function() {
 		// This function decides what type of page to show 
 		// depending on the current url hash value.
 		var temp = url.split('/')[0];
+		var prev = ' ';
 
 		$('.main-content .page').removeClass('visible');
 		var map = {
 
 			// The Homepage.
 			'': function() {
+				console.log('map home');
 				create_levels(num_levels);
 				// TODO: reset game here
 				$('.start-screen .btn-wrap').removeClass('open').find('.active').removeClass('active');
@@ -68,13 +70,11 @@ $(function() {
 				clearTimeout(timer);
 				$('#timer').text('00:00');
 
-				// reset game
-				// $('.game-screen #game').html('');
+
 
 				// Clear the filters object, uncheck all checkboxes, show all the products
 				// filters = {};
 				// checkboxes.prop('checked',false);
-
 				renderStartScreen();
 			},
 
@@ -101,8 +101,9 @@ $(function() {
 		};
 
 		// Execute the needed function depending on the url keyword (stored in temp).
-		if(map[temp]){
+		if(map[temp] && prev != temp){
 			map[temp]();
+			prev = temp;
 		}
 		// If the keyword isn't listed in the above - render the error page.
 		else {
@@ -170,6 +171,7 @@ $(function() {
 
 	function renderStartScreen() {
 		// Hides other pages and shows the starting screen.
+		console.log('rendering start');
 		$('.page').removeClass('visible');
 		$('.start-screen').addClass('visible');
 	}
