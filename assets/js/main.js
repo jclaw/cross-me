@@ -9,34 +9,11 @@ $(function() {
 	var slider_min = 20,
 		slider_max = 80;
 
-	//debug_log_data('11');
-
-	function create_levels(num_levels) {
-
-		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/levels', function(data) {
-			console.log(data);
-			for (var i = 0; i < data.length; i++) {
-				prep_data(data[i]);
-			}
-
-			levels = data; // TODO: is this right?
-			for (var i = 0; i < data.length; i++) {
-				var li = $('<li><a class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(data[i].name) + '</a></li>');
-				li.find('.btn').click(function(e) {
-					e.preventDefault();
-
-					var index = $(this).data('index');
-					console.log('clicked: ' + index);
-					window.location.hash = 'game/level/' + (index + 1);
-					
-				});
-				$('#levels').append(li);
-			}
-		});
-
-	}
 	initialize();
 	$(window).trigger('hashchange');
+	//debug_log_data('11');
+
+	
 
 	$(window).on('hashchange', function(e){
 		// On every hash change the render function is called with the new hash.
@@ -47,6 +24,8 @@ $(function() {
 	});
 
 	function initialize() {
+		console.log('levels:');
+		console.log(levels);
 		for (var i = 0; i < num_levels; i++) { levels.push(''); }
 		render(window.location.hash);
 	}
@@ -55,7 +34,7 @@ $(function() {
 		// This function decides what type of page to show 
 		// depending on the current url hash value.
 		var temp = url.split('/')[0];
-		var prev = ' ';
+		
 
 		$('.main-content .page').removeClass('visible');
 		var map = {
@@ -63,7 +42,9 @@ $(function() {
 			// The Homepage.
 			'': function() {
 				console.log('map home');
+				levels = [];
 				create_levels(num_levels);
+
 				// TODO: reset game here
 				$('.start-screen .btn-wrap').removeClass('open').find('.active').removeClass('active');
 				// reset timer
@@ -101,9 +82,8 @@ $(function() {
 		};
 
 		// Execute the needed function depending on the url keyword (stored in temp).
-		if(map[temp] && prev != temp){
+		if(map[temp]){
 			map[temp]();
-			prev = temp;
 		}
 		// If the keyword isn't listed in the above - render the error page.
 		else {
@@ -183,6 +163,33 @@ $(function() {
 
 		$('.page').not($('.game-screen')).removeClass('visible');
 		$('.game-screen').addClass('visible');
+	}
+
+	
+	function create_levels(num_levels) {
+
+		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/levels', function(data) {
+			console.log(data);
+			for (var i = 0; i < data.length; i++) {
+				prep_data(data[i]);
+			}
+			levels = data;
+			console.log(levels);
+			$('#levels').html('');
+			for (var i = 0; i < data.length; i++) {
+				var li = $('<li><a class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(data[i].name) + '</a></li>');
+				li.find('.btn').click(function(e) {
+					e.preventDefault();
+
+					var index = $(this).data('index');
+					console.log('clicked: ' + index);
+					window.location.hash = 'game/level/' + (index + 1);
+					
+				});
+				$('#levels').append(li);
+			}
+		});
+
 	}
 
 	function prep_data(data) {
