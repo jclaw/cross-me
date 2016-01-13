@@ -23,7 +23,7 @@ $(function() {
 
 					var index = $(this).data('index');
 					console.log('clicked: ' + index);
-					window.location.hash = 'game/level/' + index + 1;
+					window.location.hash = 'game/level/' + (index + 1);
 					
 				});
 				$('#levels').append(li);
