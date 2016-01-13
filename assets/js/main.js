@@ -1,6 +1,7 @@
 $(function() {
 	var gameboard = $('#gameboard');
 	var gameObject = {};
+	var timer;
 	var levels = [],
 		num_levels = 12;
 	create_levels(num_levels);
@@ -59,7 +60,13 @@ $(function() {
 			'': function() {
 
 				// TODO: reset game here
+				$('.start-screen .btn-wrap').removeClass('open').find('.active').removeClass('active');
+				// reset timer
+				clearTimeout(timer);
+				$('#timer').text('00:00');
 
+				// reset game
+				// $('.game-screen #game').html('');
 
 				// Clear the filters object, uncheck all checkboxes, show all the products
 				// filters = {};
@@ -191,7 +198,7 @@ $(function() {
 	});
 
 	$('#rboard_form [name="generate"]').click(function() {
-		$('#content_selection').hide();
+		// $('#content_selection').hide();
 
 		var w = parseInt($('#rboard_form [name="width"]').val()),
 			h = parseInt($('#rboard_form [name="height"]').val()),
@@ -404,6 +411,7 @@ $(function() {
 			width = gameObject['width'];
 
 		var border_mult = 5;
+		tbody.html('');
 		for (var r = 0; r < height + num_extra_rows; r++) {
 			
 			tbody.append('<tr>');
@@ -482,17 +490,16 @@ $(function() {
 	}
 
 	function run_timer(time_object) {
-		var timer = time_object.timer,
+		var timerObj = time_object.timer,
 			seconds = time_object.seconds,
-			minutes = time_object.minutes,
-			t;
-		t = setTimeout(function() {
+			minutes = time_object.minutes;
+		timer = setTimeout(function() {
 			seconds++;
 			if (seconds >= 60) {
 				seconds = 0;
 				minutes++;
 			}
-			timer.text((minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));
+			timerObj.text((minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds));
 			time_object.seconds = seconds;
 			time_object.minutes = minutes;
 			run_timer(time_object);
