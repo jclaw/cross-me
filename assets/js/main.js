@@ -4,7 +4,7 @@ $(function() {
 	var timer;
 	var levels = [],
 		num_levels = 12;
-	create_levels(num_levels);
+	// create_levels(num_levels);
 
 	var slider_min = 20,
 		slider_max = 80;
@@ -32,8 +32,8 @@ $(function() {
 
 		$(window).trigger('hashchange');
 	}
-
-	render(window.location.hash);
+	initialize();
+	
 
 	$(window).on('hashchange', function(){
 		// On every hash change the render function is called with the new hash.
@@ -42,6 +42,10 @@ $(function() {
 
 	});
 
+	function initialize() {
+		for (var i = 0; i < num_levels; i++) { levels.push(''); }
+		render(window.location.hash);
+	}
 
 	function render(url) {
 		// This function decides what type of page to show 
@@ -53,7 +57,7 @@ $(function() {
 
 			// The Homepage.
 			'': function() {
-
+				create_levels(num_levels);
 				// TODO: reset game here
 				$('.start-screen .btn-wrap').removeClass('open').find('.active').removeClass('active');
 				// reset timer
@@ -81,7 +85,7 @@ $(function() {
 					catch (err) { alert(err); }
 					
 				} else if (type && type == 'level' && data.length == 2) {
-					try { mapLevels(data); }
+					try { mapLevel(data); }
 					catch (err) { alert(err); }
 				} else {
 					// go to error page
@@ -131,11 +135,12 @@ $(function() {
 		};
 
 		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/random-board/', reqdata, function(d) {
+			prep_data(d);
 			renderGame(d);
 		});
 	}
 
-	function mapLevels(data) {
+	function mapLevel(data) {
 		// sanitize data
 		data[1] = parseInt(data[1]);
 		if (data[1] == NaN) throw 'Please input numbers only.';
@@ -144,7 +149,19 @@ $(function() {
 			throw data[1] + ' is not a valid level';
 		}
 		var index = data[1] - 1;
-		renderGame(levels[index]);
+		if (levels[index] == '') {
+			console.log('requesting');
+			var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/level', {index: index}, function(d) {
+				console.log(d);
+				levels[index] = d;
+				prep_data(d);
+				renderGame(d);
+			});
+		} else {
+			console.log('level already mapped');
+			console.log(levels[index]);
+			renderGame(levels[index]);
+		}
 	}
 
 	function renderStartScreen() {
@@ -156,8 +173,29 @@ $(function() {
 	function renderGame(data) {
 		// Hides other pages and shows the game with appropriate data.
 		build_data(data);
+		reset_timer();
+
 		$('.page').not($('.game-screen')).removeClass('visible');
 		$('.game-screen').addClass('visible');
+	}
+
+	function prep_data(data) {
+		objecterate(data.row_data);
+		objecterate(data.col_data);
+	}
+
+	function objecterate(arr) {
+		for (var i = 0; i < arr.length; i++) {
+			for (var j = 0; j < arr[i].length; j++) {
+				arr[i][j] = {val: arr[i][j]};
+			}
+		}
+	}
+
+	function reset_timer() {
+		clearTimeout(timer);
+		$('#timer').text('00:00');
+		start_timer();
 	}
 
 	function renderErrorPage(){
@@ -251,10 +289,6 @@ $(function() {
 			gameObject['board_name'] = data.name;
 			gameObject['height'] = data.height;
 			gameObject['width'] = data.width;
-
-			objecterate(data.row_data);
-			objecterate(data.col_data);
-
 			gameObject['row_data'] = data.row_data;
 			gameObject['col_data'] = data.col_data;
 			init_game(gameboard, gameObject);
@@ -360,9 +394,6 @@ $(function() {
 
 		});
 
-
-		start_timer(gameObject);
-		$('#game').show();
 	}
 
 	function draw_board(gameboard, gameObject) {
@@ -397,7 +428,7 @@ $(function() {
 					if (true_c >= 0 && true_c % border_mult == 0) content += ' border-left';
 
 					if (true_r >= 0 && true_c >= 0) {
-						// make cells draggable and include their index in data tags
+						// make cells draggable and include their index
 						content += ' board-element" ';
 						content += 'draggable=true data-index="' + true_r + ',' + true_c + '">';
 						var cell = $(content + '</td>');
@@ -427,6 +458,7 @@ $(function() {
 							}
 							content += ' data">';
 							var elem = arr[index1][index2 - lim + length];
+							// console.log(elem);
 							var cell = $(content + elem.val + '</td>');
 							tbody.append(cell);
 							elem.cell = cell;
@@ -752,13 +784,7 @@ $(function() {
 		}
 	}
 
-	function objecterate(arr) {
-		for (var i = 0; i < arr.length; i++) {
-			for (var j = 0; j < arr[i].length; j++) {
-				arr[i][j] = {val: arr[i][j]};
-			}
-		}
-	}
+
 
 	function is_cell_to_retain(cell, task) {
 		return (task == 'on' && cell.hasClass('active-cell')) || (task == 'off' && !cell.hasClass('active-cell'));
