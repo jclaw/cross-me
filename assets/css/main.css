@@ -120,7 +120,7 @@ td {
 	text-align: center;
 	cursor: default;
 	
-    transition: background .2s;
+    transition: .2s;
 
 }
 
@@ -250,7 +250,7 @@ tr {
 
 
 .complete {
-	background: #AAA;
+	opacity: 0.3;
 }
 
 /*.heavy-border-top {
