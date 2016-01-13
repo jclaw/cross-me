@@ -49,7 +49,6 @@ $(function() {
 				$('#timer').text('00:00');
 
 
-
 				// Clear the filters object, uncheck all checkboxes, show all the products
 				// filters = {};
 				// checkboxes.prop('checked',false);
@@ -91,7 +90,6 @@ $(function() {
 
 	function mapRandom(data) {
 		// sanitize data
-
 		for (var i = 1; i < data.length; i++) {
 			data[i] = parseInt(data[i]);
 			if (data[i] == NaN) throw 'Please input numbers only.';
@@ -109,6 +107,8 @@ $(function() {
 		if (data[3] > slider_max || data[3] < slider_min) {
 			throw 'Please input a whitespace value less than ' + slider_max + ' and greater than ' + slider_min + '.';
 		}
+		setHeader('.game-screen', 'Random Board');
+
 		// make request
 		var reqdata = {
 			width: data[1],
@@ -120,6 +120,7 @@ $(function() {
 			prep_data(d);
 			renderGame(d);
 		});
+		
 	}
 
 	function mapLevel(data) {
@@ -131,16 +132,20 @@ $(function() {
 			throw data[1] + ' is not a valid level';
 		}
 		var index = data[1] - 1;
+		
 		if (levels[index] == '') {
 			var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/level', {index: index}, function(d) {
 
 				levels[index] = d;
 				prep_data(d);
+				setHeader('.game-screen', 'Level ' + (index + 1) + ': ' + d.name);
 				renderGame(d);
 			});
 		} else {
+			setHeader('.game-screen', 'Level ' + (index + 1) + ': ' + levels[index].name);
 			renderGame(levels[index]);
 		}
+		
 	}
 
 	function renderStartScreen() {
@@ -158,6 +163,12 @@ $(function() {
 		$('.game-screen').addClass('visible');
 	}
 
+	function setHeader(page, string, sub1) {
+		var header = $(page).find('.header');
+		header.html('<h1>' + string + '</h1>');
+		if (sub1) header.append('<h2>' + sub1 + '</h2>');
+	}
+
 	
 	function create_levels(num_levels) {
 
@@ -168,7 +179,7 @@ $(function() {
 			levels = data;
 			$('#levels').html('');
 			for (var i = 0; i < data.length; i++) {
-				var li = $('<li><a class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(data[i].name) + '</a></li>');
+				var li = $('<li><a class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + data[i].name + '</a></li>');
 				li.find('.btn').click(function(e) {
 					e.preventDefault();
 
