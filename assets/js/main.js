@@ -15,6 +15,10 @@ $(function() {
 
 		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/levels', function(data) {
 			console.log(data);
+			for (var i = 0; i < data.length; i++) {
+				prep_data(data[i]);
+			}
+
 			levels = data; // TODO: is this right?
 			for (var i = 0; i < data.length; i++) {
 				var li = $('<li><a class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(data[i].name) + '</a></li>');
@@ -458,7 +462,7 @@ $(function() {
 							}
 							content += ' data">';
 							var elem = arr[index1][index2 - lim + length];
-							// console.log(elem);
+							console.log(elem);
 							var cell = $(content + elem.val + '</td>');
 							tbody.append(cell);
 							elem.cell = cell;
