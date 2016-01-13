@@ -12,7 +12,6 @@ $(function() {
 	//debug_log_data('11');
 
 	function create_levels(num_levels) {
-		console.log('creating levels');
 
 		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/levels', function(data) {
 			console.log(data);
@@ -30,7 +29,7 @@ $(function() {
 				$('#levels').append(li);
 			}
 		});
-		console.log('triggering');
+
 		$(window).trigger('hashchange');
 	}
 
@@ -39,8 +38,6 @@ $(function() {
 	$(window).on('hashchange', function(){
 		// On every hash change the render function is called with the new hash.
 		// This is how the navigation of our app happens.
-		console.log('hashchange');
-		console.log(window.location);
 		render(window.location.hash);
 
 	});
@@ -50,10 +47,8 @@ $(function() {
 		// This function decides what type of page to show 
 		// depending on the current url hash value.
 		var temp = url.split('/')[0];
-		console.log('temp:');
-		console.log(temp);
+
 		$('.main-content .page').removeClass('visible');
-		console.log('render');
 		var map = {
 
 			// The Homepage.
@@ -77,13 +72,10 @@ $(function() {
 
 			// Game page.
 			'#game': function() {
-				console.log('rendering game');
 				// Establish whether the game is a level or random
 				var hash = url.split('#game/')[1].trim(),
 					data = hash.split('/'),
 					type = data[0].trim();
-				console.log(data);
-				console.log(type);
 				if (type && type == 'random' && data.length == 4) {
 					try { mapRandom(data); } 
 					catch (err) { alert(err); }
@@ -139,7 +131,6 @@ $(function() {
 		};
 
 		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/random-board/', reqdata, function(d) {
-			console.log(d);
 			renderGame(d);
 		});
 	}
@@ -153,13 +144,11 @@ $(function() {
 			throw data[1] + ' is not a valid level';
 		}
 		var index = data[1] - 1;
-		console.log('rendering level ' + index);
 		renderGame(levels[index]);
 	}
 
 	function renderStartScreen() {
 		// Hides other pages and shows the starting screen.
-		console.log('renderStartScreen');
 		$('.page').removeClass('visible');
 		$('.start-screen').addClass('visible');
 	}
@@ -297,24 +286,6 @@ $(function() {
 			check_completion(gameObject, $(this));
 		});
 		
-		boardComponents['cells'].on('change', function(event) {
-			console.log('change');
-		});
-
-		boardComponents['cells'].on('mouseover', function(event) {
-
-			// console.log('over');
-			
-			// $(this).addClass('mouseover');
-				
-		});
-
-
-		boardComponents['cells'].on('mouseout', function(event) {
-			// $(this).removeClass('mouseover');
-			//console.log('out');
-		});
-
 
 		boardComponents['cells'].on('dragstart', function(event) {
 
@@ -344,8 +315,6 @@ $(function() {
 			}
 			
 			dragObject['stack'].push(dragObject['start']);
-			
-			console.log('start');
 
 			// hide ghost image
 		    var crt = $(this).clone();
@@ -389,8 +358,6 @@ $(function() {
 
 			while (dragObject['stack'].length > 0) dragObject['stack'].pop();
 
-			console.log('end');
-			console.log(event.dataTransfer.dropEffect);
 		});
 
 
@@ -548,7 +515,6 @@ $(function() {
 
 		if (dragObject['direction'] != 'none' && dragObject['direction'] != direction) {
 			// change direction
-			console.log('change_direction');
 			while (dragObject['stack'].length > 1) {
 				var elem = dragObject['stack'].pop();
 				if (elem['cell'] != '' && task == 'on') elem['cell'].removeClass('active-cell');
@@ -590,6 +556,8 @@ $(function() {
 			
 			var debug_count = 0;
 			var count = 1;
+
+			// catch up on missed dragenter events
 			while (true) {
 				if (debug_count > 50) {console.log('ERROR'); break;}
 				if (direction == 'left' || direction == 'right') {
@@ -610,7 +578,6 @@ $(function() {
 				} 
 				count++;
 				debug_count++;
-				console.log('catching up');
 				
 			}
 			if (direction == 'left' || direction == 'right') {
@@ -634,8 +601,6 @@ $(function() {
 			if (elem['cell'] != '' && task == 'on') elem['cell'].removeClass('active-cell');
 			else if (elem['cell'] != '' && task == 'off') elem['cell'].addClass('active-cell');
 		}
-
-		console.log('real dragenter');
 		
 		dragObject['curr'] = curr; // TODO: do I need this?
 	}
@@ -677,6 +642,7 @@ $(function() {
 	}
 
 	function check_completion(gameObject, cell) {
+
 		var start_data = get_indices(cell),
 			r = start_data[0],
 			c = start_data[1];
@@ -715,6 +681,15 @@ $(function() {
 
 			compare_arrays(user_data, gameObject[arr_name][index]);
 
+			var finished = true;
+			$('#gameboard .data').each(function() {
+				if ($(this).text() != '' && !$(this).hasClass('complete')) finished = false;
+			});
+
+			if (finished) {
+				// check solution
+				console.log('check solution');
+			}
 		}
 	}
 
@@ -755,13 +730,13 @@ $(function() {
 					data[i].cell.removeClass('complete');
 					index++;
 				} else {
-					console.log('removing all');
 					remove_all_complete(data);
 					break;
 				}
 			}
 		}
 	}
+
 
 	function same_array(arr1, arr2) {
 		if (arr1.length != arr2.length) return false;

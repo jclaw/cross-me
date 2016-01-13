@@ -26,21 +26,20 @@ body {
 }
 
 .small-container {
-	width: 100%;
+	width: 344px;
 	margin: 0 auto;
 	position: relative;
 }
 
 @media only screen and (min-width: 786px) {
 	.small-container {
-		width: 60%;
+		width: 506px;
 	}
 }
 
-@media only screen and (min-width: 946px) {
-	.small-container {
-		width: 30%;
-	}
+#rboard_form {
+	padding: 0px 20px 20px;
+	position: relative;
 }
 
 #rboard_form .container {
@@ -66,19 +65,17 @@ body {
 
 #levels {
 	list-style-type: none;
-	padding: 0px 30px 30px;
+	padding: 10px;
+	margin: 0;
 }
 
 #levels li {
-	float: left;
+	display: inline-block;
 	margin: 5px;
 	height: 71px;
 }
 
-#rboard_form {
-	padding: 0px 30px 30px;
-	position: relative;
-}
+
 
 .form-section {
 	/*padding-bottom: 20px;*/
