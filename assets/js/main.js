@@ -24,8 +24,6 @@ $(function() {
 	});
 
 	function initialize() {
-		console.log('levels:');
-		console.log(levels);
 		for (var i = 0; i < num_levels; i++) { levels.push(''); }
 		render(window.location.hash);
 	}
@@ -41,7 +39,6 @@ $(function() {
 
 			// The Homepage.
 			'': function() {
-				console.log('map home');
 				levels = [];
 				create_levels(num_levels);
 
@@ -135,23 +132,19 @@ $(function() {
 		}
 		var index = data[1] - 1;
 		if (levels[index] == '') {
-			console.log('requesting');
 			var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/level', {index: index}, function(d) {
-				console.log(d);
+
 				levels[index] = d;
 				prep_data(d);
 				renderGame(d);
 			});
 		} else {
-			console.log('level already mapped');
-			console.log(levels[index]);
 			renderGame(levels[index]);
 		}
 	}
 
 	function renderStartScreen() {
 		// Hides other pages and shows the starting screen.
-		console.log('rendering start');
 		$('.page').removeClass('visible');
 		$('.start-screen').addClass('visible');
 	}
@@ -169,12 +162,10 @@ $(function() {
 	function create_levels(num_levels) {
 
 		var jqxhr = $.get( 'http://nonograms-server.herokuapp.com/levels', function(data) {
-			console.log(data);
 			for (var i = 0; i < data.length; i++) {
 				prep_data(data[i]);
 			}
 			levels = data;
-			console.log(levels);
 			$('#levels').html('');
 			for (var i = 0; i < data.length; i++) {
 				var li = $('<li><a class="btn btn-inv-tertiary btn-square" data-index="' + i + '">' + toTitleCase(data[i].name) + '</a></li>');
@@ -182,7 +173,6 @@ $(function() {
 					e.preventDefault();
 
 					var index = $(this).data('index');
-					console.log('clicked: ' + index);
 					window.location.hash = 'game/level/' + (index + 1);
 					
 				});
@@ -471,7 +461,6 @@ $(function() {
 							}
 							content += ' data">';
 							var elem = arr[index1][index2 - lim + length];
-							console.log(elem);
 							var cell = $(content + elem.val + '</td>');
 							tbody.append(cell);
 							elem.cell = cell;
