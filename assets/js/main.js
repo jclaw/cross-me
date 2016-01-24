@@ -613,7 +613,6 @@ $(function() {
 					c_off = 0;
 				}
 				var cell = $(gameObject['array'][curr.row + r_off][curr.col + c_off]);
-				if (dragObject['stack'])
 				var top_stack = dragObject['stack'][dragObject['stack'].length - 1];
 
 				if ( is_cell_to_retain(cell, task) && top_stack['cell'] == '') {
